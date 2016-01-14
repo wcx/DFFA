@@ -34,12 +34,23 @@ def push_files():
     return remote_files
 
 
+def open_file(files):
+    intent = 'android.intent.action.VIEW'
+    mimetype = 'application/pdf'
+    for file in files:
+        data = 'file://' + file
+        open_cmd = ['adb', 'shell', 'am', 'start', '-W', '-a',
+                    intent, '-d', data, '-t', mimetype, 'cn.wps.moffice_eng']
+        p = subprocess.Popen(open_cmd)
+    return p
+
+
 def main():
     print("Start Pushing")
     files = push_files()
-    print (files)
+    print(files)
     print("Done pushing")
-
+    open_file(files)
 
 if __name__ == '__main__':
     main()
