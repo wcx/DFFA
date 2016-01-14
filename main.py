@@ -1,8 +1,8 @@
 """
 /*
  * Android framework fuzzer
- * Author: wcx 
- * 对以文件为输入的Android APP 进行Fuzzing，收集错误信息，进行分类 
+ * Author: wcx
+ * 对以文件为输入的Android APP 进行Fuzzing，收集错误信息，进行分类
  */
 
 """
@@ -14,10 +14,12 @@ import pexpect
 import glob
 from install import PackageInstaller
 
+
 class AndroidLogger:
     '''
     从Android device/emulator收集logs
     '''
+
     def __init__(self, log_dir='logs'):
         self.logs = {}
         log_cmd = 'adb -e logcat'
@@ -29,7 +31,7 @@ class AndroidLogger:
         except pexpect.TIMEOUT:
             pass
 
-    def add_log_dir(self, log_dir): # Bug, 如果存在相同文件名呢？
+    def add_log_dir(self, log_dir):  # Bug, 如果存在相同文件名呢？
         if log_dir[-1] != '/':
             log_dir += '/'
         if os.path.isdir(log_dir):
@@ -55,7 +57,7 @@ class AndroidLogger:
         向当前文件写入log
         '''
         # logs_dict = self.pop_program_logs(program)
-        # # self.logfile.write(json.dumps(logs_dict))
+        # self.logfile.write(json.dumps(logs_dict))
         # if check_segfault(logs_dict):
         #     self.logfile.write(program +'\n\n\n')
         #     self.logfile.write(unicode(logs_dict))
@@ -63,7 +65,7 @@ class AndroidLogger:
         return self.logfile
 
     def add_app(self, app):
-        
+
         # if self.logfile:
         #     self.logfile.close()
         #     self.logfile = None
@@ -74,7 +76,7 @@ class AndroidLogger:
 
     def get_logs(self):
         '''
-        返回adb logs 
+        返回adb logs
         '''
         return self.logs
 
@@ -112,15 +114,17 @@ class AndroidLogger:
             logs = '\n'.join([logs, log_line])
         return logs
 
+
 def push_files(remote_path='/mnt/sdcard/Download', local_path='pdfs', adb='adb'):
     '''
     向android devices push files
     '''
     cmd = [adb, 'push', local_path, remote_path]
     popen_wait(cmd)
-    files=os.listdir(local_path)
+    files = os.listdir(local_path)
     remote_files = [remote_path + '/' + file for file in files]
     return remote_files
+
 
 def stop_app(application, process=None):
     '''
@@ -128,9 +132,10 @@ def stop_app(application, process=None):
     '''
     if process:
         process.kill()
-    home_screen() # Can't kill apps in foreground
+    home_screen()  # Can't kill apps in foreground
     stop_cmd = ['adb', 'shell', 'am', 'force-stop', application]
     return popen_wait(stop_cmd)
+
 
 def popen_wait(cmd, message=None):
     '''
@@ -142,14 +147,17 @@ def popen_wait(cmd, message=None):
         print(message)
     return ret_val
 
+
 def open_file(file, intent, mimetype):
     '''
     创造一个 打开文件的Popen object并且返回 Popen object
     '''
     data = 'file://' + file
-    open_cmd = ['adb', 'shell', 'am', 'start', '-W', '-a', intent, '-d', data, '-t', mimetype]
+    open_cmd = ['adb', 'shell', 'am', 'start', '-W',
+                '-a', intent, '-d', data, '-t', mimetype]
     p = subprocess.Popen(open_cmd)
     return p
+
 
 def open_files(files, intent='android.intent.action.VIEW', mimetype='application/pdf', log_dir='logs'):
     logger = AndroidLogger(log_dir)
@@ -166,11 +174,13 @@ def open_files(files, intent='android.intent.action.VIEW', mimetype='application
         application = package_installer.uninstall(application)
     return app_logfiles
 
+
 def home_screen():
     '''
     向Android Device发送HOME键动作事件
     '''
     return send_key_event('3')
+
 
 def send_key_event(event_num):
     '''
@@ -179,11 +189,13 @@ def send_key_event(event_num):
     cmd = ['adb', 'shell', 'input', 'keyevent', event_num]
     return popen_wait(cmd)
 
+
 def power_button():
     '''
     向Android Device发送POWER键动作事件
     '''
     return send_key_event('26')
+
 
 def kill_app(app):
     '''
@@ -193,11 +205,13 @@ def kill_app(app):
     kill_cmd = ['adb', 'shell', 'am', 'kill', app]
     return popen_wait(kill_cmd)
 
+
 def adb_cmd(cmd):
     '''
     ADB命令
     '''
     return ['adb'] + cmd
+
 
 def adb_shell_cmd(cmd):
     '''
@@ -205,11 +219,13 @@ def adb_shell_cmd(cmd):
     '''
     return adb_cmd(['shell']) + cmd
 
+
 def cleanup(files):
     '''
     清除文件
     '''
     return popen_wait(adb_shell_cmd(['rm'] + files))
+
 
 def check_segfault(log_dict):
     # regex = r'F/libc    \(  \d*\): Fatal signal \d{2,8} .*terminated by signal \(11\)'# r'Fatal signal 11(.|\n)*Process \d{2,8} terminated by signal'
@@ -237,7 +253,7 @@ def fuzz(log_dir='logs'):
     return logs, files
 
 # def examine_logs(log_dir):
-#     if log_dir[-1] != '/': # should make a decorator
+# if log_dir[-1] != '/': # should make a decorator
 #         log_dir += '/'
 #     logs = glob.glob(log_dir + '*.log')
 #     for log_file in logs:
@@ -245,10 +261,10 @@ def fuzz(log_dir='logs'):
 #         log_file_contents = log_file_fp.read()
 #         log_file_fp.close()
 #         check_segfault(json.loads(log_file_contents))
-#         # segfault_logs = check_segfault(log_file_contents)
-#         # if segfault_logs:
-#         #     segfault_logs_fp = json.loads(open(logfile + '.segfault', 'w+'))
-#         #     segfault_logs_fp.write(segfault_logs)
+# segfault_logs = check_segfault(log_file_contents)
+# if segfault_logs:
+# segfault_logs_fp = json.loads(open(logfile + '.segfault', 'w+'))
+# segfault_logs_fp.write(segfault_logs)
 
 
 def main():
@@ -259,5 +275,5 @@ def main():
     print "Done logging"
     cleanup(fuzz_files)
 
-if __name__=='__main__':
+if __name__ == '__main__':
     main()
