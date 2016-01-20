@@ -7,18 +7,7 @@
 
 """
 import os
-import subprocess
-
-
-def popen_wait(cmd, message=None):
-    '''
-    开始一个子进程
-    '''
-    p = subprocess.Popen(cmd)
-    ret_val = p.wait()
-    if message:
-        print(message)
-    return ret_val
+from utils import *
 
 
 def push_files():
@@ -41,16 +30,34 @@ def open_file(files):
         data = 'file://' + file
         open_cmd = ['adb', 'shell', 'am', 'start', '-W', '-a',
                     intent, '-d', data, '-t', mimetype, 'cn.wps.moffice_eng']
-        p = subprocess.Popen(open_cmd)
-    return p
+        stop_cmd = ['adb', 'shell', 'am', 'force-stop', 'cn.wps.moffice_eng']
+        popen_wait(open_cmd)
+        popen_wait(stop_cmd)
+
+
+def cleanup(files):
+    '''
+    清除文件
+    '''
+    rm_cmd = ['adb', 'shell', 'rm'] + files
+    return popen_wait(rm_cmd)
 
 
 def main():
-    print("Start Pushing")
+    # 推送测试文件
+    print_symbol("Start pushing")
     files = push_files()
     print(files)
-    print("Done pushing")
+    print_symbol("Done pushing")
+    # 打开测试文件
+    print_symbol("Start opening")
     open_file(files)
+    print_symbol("Done opening")
+    # 清除测试文件
+    print_symbol("Start removing")
+    print(files)
+    cleanup(files)
+    print_symbol("Done removing")
 
 if __name__ == '__main__':
     main()
