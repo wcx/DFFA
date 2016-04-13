@@ -1,3 +1,5 @@
 nohup.out
 __pycache__/*
 files/*
+*.bak
+*.pyc
