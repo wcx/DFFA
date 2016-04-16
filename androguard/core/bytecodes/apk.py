@@ -42,6 +42,7 @@ ZIPMODULE = 1
 if sys.hexversion < 0x2070000:
     try:
         import chilkat
+
         ZIPMODULE = 0
         # UNLOCK : change it with your valid key !
         try:
@@ -57,7 +58,6 @@ else:
 
 ################################################### CHILKAT ZIP FORMAT ###
 class ChilkatZip(object):
-
     def __init__(self, raw):
         self.files = []
         self.zip = chilkat.CkZip()
@@ -123,7 +123,6 @@ def sign_apk(filename, keystore, storepass):
 
 
 class Error(Exception):
-
     """Base class for exceptions in this module."""
     pass
 
@@ -134,7 +133,6 @@ class FileNotPresent(Error):
 
 ######################################################## APK FORMAT ######
 class APK(object):
-
     """
         This class can access to all elements in an APK file
 
@@ -529,7 +527,6 @@ class APK(object):
             :param tag_name: a string which specify the tag name
             :param attribute: a string which specify the attribute
         """
-        print "ttt"
         l = []
         for i in self.xml:
             for item in self.xml[i].getElementsByTagName(tag_name):
@@ -540,22 +537,21 @@ class APK(object):
         return l
 
     def get_type(self):
-            """ Return elements in xml files which match
-        with the tag name and the specific attribute
+        """ Return elements in xml files which match
+    with the tag name and the specific attribute
 
-                :param tag_name: a string which specify the tag name
-                :param attribute: a string which specify the attribute
-            """
-            for i in self.xml:
-                print i
-                for item in self.xml[i].getElementsByTagName("activity"):
-                    for sitem in item.getElementsByTagName("intent-filter"):
-                        for ssitem in sitem.getElementsByTagName("data"):
-                            val = ssitem.getAttributeNS(NS_ANDROID_URI, "mimeType")
-                            if val == "image/*":
-                                print "activity:"+item.getAttributeNS(NS_ANDROID_URI, "name")
-                                print "type:"+val
-                                print "--------------------------------------------------------------------------------"
+            :param tag_name: a string which specify the tag name
+            :param attribute: a string which specify the attribute
+        """
+        for i in self.xml:
+            for item in self.xml[i].getElementsByTagName("activity"):
+                for sitem in item.getElementsByTagName("intent-filter"):
+                    for ssitem in sitem.getElementsByTagName("data"):
+                        val = ssitem.getAttributeNS(NS_ANDROID_URI, "mimeType")
+                        if val == "image/*":
+                            print "activity:" + item.getAttributeNS(NS_ANDROID_URI, "name")
+                            print "type:" + val
+                            print "--------------------------------------------------------------------------------"
 
     def format_value(self, value):
         if len(value) > 0:
@@ -815,19 +811,6 @@ class APK(object):
         """
         return self.get_elements("uses-library", "name")
 
-    def get_certificate(self, filename):
-        """
-            Return a certificate object by giving the name in the apk file
-        """
-        import chilkat
-
-        cert = chilkat.CkCert()
-        f = self.get_file(filename)
-        data = chilkat.CkByteData()
-        data.append2(f, len(f))
-        success = cert.LoadFromBinary(data)
-        return success, cert
-
     def new_zip(self, filename, deleted_files=None, new_files={}):
         """
             Create a new zip file
@@ -987,6 +970,7 @@ def show_Certificate(cert):
         cert.subjectC(), cert.subjectCN(), cert.subjectDN(), cert.subjectE(),
         cert.subjectL(), cert.subjectO(), cert.subjectOU(), cert.subjectS())
 
+
 ################################## AXML FORMAT ###########################
 # Translated from
 # http://code.google.com/p/android4me/source/browse/src/android/content/res/AXmlResourceParser.java
@@ -997,7 +981,6 @@ CHUNK_NULL_TYPE = 0x00000000
 
 
 class StringBlock(object):
-
     def __init__(self, buff):
         self.start = buff.get_idx()
         self._cache = {}
@@ -1162,7 +1145,6 @@ TEXT = 4
 
 
 class AXMLParser(object):
-
     def __init__(self, raw_buff):
         self.reset()
 
@@ -1326,7 +1308,7 @@ class AXMLParser(object):
 
     def getName(self):
         if self.m_name == -1 or (self.m_event != START_TAG and
-                                 self.m_event != END_TAG):
+                                         self.m_event != END_TAG):
             return u''
 
         return self.sb.getString(self.m_name)
@@ -1512,7 +1494,6 @@ def format_value(_type, _data, lookup_string=lambda ix: "<string>"):
 
 
 class AXMLPrinter(object):
-
     def __init__(self, raw_buff):
         self.axml = AXMLParser(raw_buff)
         self.xmlns = False
@@ -1619,7 +1600,6 @@ ACONFIGURATION_UI_MODE = 0x1000
 
 
 class ARSCParser(object):
-
     def __init__(self, raw_buff):
         self.analyzed = False
         self.buff = bytecode.BuffHandle(raw_buff)
@@ -2080,14 +2060,13 @@ class ARSCParser(object):
 
         for res_type, configs in self.resource_configs[package_name].items():
             if res_type.get_package_name() == package_name and (
-                    type_name is None or res_type.get_type() == type_name):
+                            type_name is None or res_type.get_type() == type_name):
                 result[res_type.get_type()].extend(configs)
 
         return result
 
 
 class PackageContext(object):
-
     def __init__(self, current_package, stringpool_main, mTableStrings,
                  mKeyStrings):
         self.stringpool_main = stringpool_main
@@ -2106,7 +2085,6 @@ class PackageContext(object):
 
 
 class ARSCHeader(object):
-
     def __init__(self, buff):
         self.start = buff.get_idx()
         self.type = unpack('<h', buff.read(2))[0]
@@ -2115,7 +2093,6 @@ class ARSCHeader(object):
 
 
 class ARSCResTablePackage(object):
-
     def __init__(self, buff):
         self.start = buff.get_idx()
         self.id = unpack('<I', buff.read(4))[0]
@@ -2133,7 +2110,6 @@ class ARSCResTablePackage(object):
 
 
 class ARSCResTypeSpec(object):
-
     def __init__(self, buff, parent=None):
         self.start = buff.get_idx()
         self.parent = parent
@@ -2148,7 +2124,6 @@ class ARSCResTypeSpec(object):
 
 
 class ARSCResType(object):
-
     def __init__(self, buff, parent=None):
         self.start = buff.get_idx()
         self.parent = parent
@@ -2182,7 +2157,6 @@ class ARSCResType(object):
 
 
 class ARSCResTableConfig(object):
-
     @classmethod
     def default_config(cls):
         if not hasattr(cls, 'DEFAULT'):
@@ -2289,7 +2263,6 @@ class ARSCResTableConfig(object):
 
 
 class ARSCResTableEntry(object):
-
     def __init__(self, buff, mResId, parent=None):
         self.start = buff.get_idx()
         self.mResId = mResId
@@ -2329,7 +2302,6 @@ class ARSCResTableEntry(object):
 
 
 class ARSCComplex(object):
-
     def __init__(self, buff, parent=None):
         self.start = buff.get_idx()
         self.parent = parent
@@ -2347,7 +2319,6 @@ class ARSCComplex(object):
 
 
 class ARSCResStringPoolRef(object):
-
     def __init__(self, buff, parent=None):
         self.start = buff.get_idx()
         self.parent = parent
