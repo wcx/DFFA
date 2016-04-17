@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*
-class Testcase(object):
+
+
+class TestTarget(object):
     def __init__(self, package, activity, file_type, file_name, app_name, version_code, version_name):
         self.package = package
         self.activity = activity
