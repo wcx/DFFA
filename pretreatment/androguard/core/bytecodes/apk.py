@@ -308,9 +308,10 @@ class APK(object):
                 app_name = res_parser.get_resolved_res_configs(
                     res_id,
                     ARSCResTableConfig.default_config())[0][1]
-            except Exception, e:
-                androconf.warning("Exception selecting app icon: %s", e)
-                app_name = ""
+            except Exception as e:
+                # androconf.warning("Exception selecting app icon: %s", e)
+                print e
+                app_name = self.get_package()
         return app_name
 
     def get_app_icon(self, max_dpi=65536):

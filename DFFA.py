@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*
 """
 /*
  * Android framework fuzzer
@@ -14,7 +16,7 @@ def push_files():
     '''
     向android devices push files
     '''
-    local_path = 'pdfs'
+    local_path = 'files/pdfs'
     remote_path = '/mnt/sdcard/FuzzDownload'
     cmd = ['adb', 'push', local_path, remote_path]
     popen_wait(cmd)
@@ -26,7 +28,9 @@ def push_files():
 def open_file(files):
     intent = 'android.intent.action.VIEW'
     mimetype = 'application/pdf'
+    print(files)
     for file in files:
+        print(file)
         data = 'file://' + file
         open_cmd = ['adb', 'shell', 'am', 'start', '-W', '-a',
                     intent, '-d', data, '-t', mimetype, 'cn.wps.moffice_eng']
@@ -39,7 +43,7 @@ def cleanup(files):
     '''
     清除文件
     '''
-    rm_cmd = ['adb', 'shell', 'rm'] + files
+    rm_cmd = ['adb', 'shell', 'rm', '-r'] + files
     return popen_wait(rm_cmd)
 
 
@@ -58,6 +62,7 @@ def main():
     print(files)
     cleanup(files)
     print_symbol("Done removing")
+
 
 if __name__ == '__main__':
     main()

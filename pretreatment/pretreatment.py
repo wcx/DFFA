@@ -3,11 +3,15 @@
 import sys
 
 sys.path.append('../../')
-
+reload(sys)
+sys.setdefaultencoding('utf8')
 import os
 from androguard.core.bytecodes import apk
-from androguard.target import TestTarget
+from target import TestTarget
 from transwarp.db import MySQLHelper
+
+BASE_APK_PATH = "/home/wcx/Download/apk"
+
 
 def get_mime_types(apkf):
     d = dict()
@@ -30,6 +34,7 @@ def get_mime_types(apkf):
 
 def to_targets(apk_path):
     apkf = apk.APK(apk_path)
+    print "------------------name:"+apkf.get_app_name()+"---------------------"
     # 转换为TestTarget,并放入集合
     print "---开始---分析mime type---"
     d = get_mime_types(apkf)
@@ -50,24 +55,29 @@ def to_sql(targets, sqlhelper):
 
 
 def parse_apk(apk_path, sqlhelper):
-    print "---开始---解析APK----"
     targets = to_targets(apk_path)
-    print "---结束---解析APK----"
     print "---开始---存入数据库----"
     to_sql(targets, sqlhelper)
     print "---结束---存入数据库----"
 
 
-def parse_apks():
+def parse_apks(base_path):
     sqlhelper = MySQLHelper()
-    local_path = '/home/wcx/Download/apk'
+    local_path = base_path
     files = os.listdir(local_path)
     apk_paths = [local_path + '/' + f for f in files]
-    print apk_paths.__str__()
-    for path in apk_paths:
+    print "----------------------------------共" + len(apk_paths).__str__() + "个待解析APK------------------------------"
+    for i, path in enumerate(apk_paths):
+        print "-----------------开始解析第" + str(i + 1) + "个APK:" + path + "----------------------"
         parse_apk(path, sqlhelper)
+        print "-----------------结束解析第" + str(i + 1) + "个APK:" + path + "----------------------\n"
     sqlhelper.close()
 
 
 if __name__ == '__main__':
-    parse_apks()
+    parse_apks(BASE_APK_PATH)
+    # apkf = apk.APK('/home/wcx/Download/apk/04d7098dc1c6268c870d0b20aa881bfe.apk')
+    # print apkf.get_app_name()
+    # sqlhelper = MySQLHelper()
+    # parse_apk('/home/wcx/Download/apk/04d7098dc1c6268c870d0b20aa881bfe.apk', sqlhelper)
+    # sqlhelper.close()
