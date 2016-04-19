@@ -9,7 +9,8 @@
 
 """
 import os
-from utils import *
+
+from utils.utils import *
 
 
 def push_files():

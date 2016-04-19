@@ -11,9 +11,3 @@ class TestTarget(object):
         self.app_name = app_name
         self.version_code = version_code
         self.version_name = version_name
-
-    def get_package_name(self):
-        return self.package
-
-    def set_package_name(self, package):
-        self.package = package

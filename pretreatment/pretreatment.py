@@ -5,6 +5,7 @@ import sys
 sys.path.append('../../')
 reload(sys)
 sys.setdefaultencoding('utf8')
+
 import os
 from androguard.core.bytecodes import apk
 from target import TestTarget
@@ -26,15 +27,15 @@ def get_mime_types(apkf):
                         mime_types.add(val)
             # 添加activity以及对应的mime types
             if mime_types:
-                print "activity:" + activity + "||||types:" + mime_types.__str__()
-                d.update({activity: mime_types})
-        print "activity number:" + str(len(d)) + "||||" + d.__str__()
+                print "activity:" + apkf.format_value(activity) + "||||types:" + mime_types.__str__()
+                d.update({apkf.format_value(activity): mime_types})
+        print "activity number:" + len(d).__str__() + "||||" + d.__str__()
     return d
 
 
 def to_targets(apk_path):
     apkf = apk.APK(apk_path)
-    print "------------------name:"+apkf.get_app_name()+"---------------------"
+    print "------------------appname:" + apkf.get_app_name() + "---------------------"
     # 转换为TestTarget,并放入集合
     print "---开始---分析mime type---"
     d = get_mime_types(apkf)
