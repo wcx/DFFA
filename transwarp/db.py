@@ -32,7 +32,7 @@ class MySQLHelper:
             self.conn.set_character_set(self.charset)
             self.cur = self.conn.cursor()
             self.cur.execute("create database if not exists %s default character set %s collate utf8_general_ci" % (
-            self.db, self.charset))
+                self.db, self.charset))
             self.conn.select_db(self.db)
             self.cur.execute("drop table if exists %s" % self.table)
             sql = "create table {0}" \
@@ -43,7 +43,8 @@ class MySQLHelper:
                   "mime_type varchar(30)," \
                   "app_name varchar(30)," \
                   "version_code varchar(30)," \
-                  "version_name varchar(30))" \
+                  "version_name varchar(30)," \
+                  "seed varchar(30))" \
                 .format(self.table)
             self.cur.execute(sql)
 
@@ -109,6 +110,10 @@ class MySQLHelper:
             self.cur.close()
         if self.conn.open:
             self.conn.close()
+
+    def insert_targets(self, targets):
+        for target in targets:
+            self.insert(self.TABLE_TARGET, vars(target))
 
 
 if __name__ == '__main__':

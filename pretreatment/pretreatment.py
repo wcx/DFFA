@@ -45,20 +45,15 @@ def to_targets(apk_path):
     for activity in d:
         for mime_type in d[activity]:
             targets.add(TestTarget(apkf.get_package(), activity, mime_type, apkf.get_filename(), apkf.get_app_name(),
-                                   apkf.get_androidversion_code(), apkf.get_androidversion_name()))
+                                   apkf.get_androidversion_code(), apkf.get_androidversion_name(), "~/home"))
     print "---结束---target convert---"
     return targets
-
-
-def to_sql(targets, sqlhelper):
-    for target in targets:
-        sqlhelper.insert(sqlhelper.TABLE_TARGET, vars(target))
 
 
 def parse_apk(apk_path, sqlhelper):
     targets = to_targets(apk_path)
     print "---开始---存入数据库----"
-    to_sql(targets, sqlhelper)
+    sqlhelper.insert_targets(targets)
     print "---结束---存入数据库----"
 
 
