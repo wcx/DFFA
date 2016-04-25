@@ -135,7 +135,6 @@ class MySQLHelper:
 
 
 if __name__ == '__main__':
-    print sys.path
     sqlhelper = MySQLHelper()
     # p_data = {'package': "com.test", 'activity': "com.test.act", 'file_name': "/sd/a/a.jpg", 'app_name': "piuk",
     #           'version_code': "123", "version_name": "1.01", "seed": "~/"}

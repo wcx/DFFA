@@ -12,7 +12,6 @@ import os
 
 from transwarp.db import MySQLHelper
 from utils.utils import *
-from pretreatment.target import TestTarget
 
 
 def push_files():
@@ -69,18 +68,41 @@ def main():
 
 class TestCase(object):
     def __init__(self, target, mutant_file):
-        self.target = target
-        self.mutant_file = mutant_file
+        self._target = target
+        self._mutant_file = mutant_file
+
+    @property
+    def target(self):
+        return self._target
+
+    @property
+    def mutant_file(self):
+        return self._mutant_file
+
+    @mutant_file.setter
+    def mutant_file(self, value):
+        self._mutant_file = value
+
+    @target.setter
+    def target(self, value):
+        self._target = value
 
 
 if __name__ == '__main__':
     sqlhelper = MySQLHelper()
     target = sqlhelper.query_target()
     sqlhelper.close()
-    print target.activity
-    case = TestCase(target, "file:///mnt/sdcard/Download/nexusx_1920x1080.png")
-    cmd = ['adb', 'shell', 'am', 'start', '-W', '-a', 'android.intent.action.SEND_MULTIPLE', '-d', case.mutant_file,
-           case.target.package + "/" + case.target.activity]
+
+    mutant_file = "file:///mnt/sdcard/Download/nexusx_1920x1080.png"
+    case = TestCase(target, mutant_file)
+    base_cmd = ['adb', 'shell', 'am', 'start', '-W', '-S']
+    base_cmd.extend(['-a', 'android.intent.action.SEND_MULTIPLE'])
+    base_cmd.extend(['-t', case.target.mime_type])
+    base_cmd.extend(['-d', case.mutant_file])
+    base_cmd.append(case.target.package + "/" + case.target.activity)
+    # cmd = ['adb', 'shell', 'am', 'start', '-W', '-a', 'android.intent.action.SEND_MULTIPLE', '-d', case.mutant_file,
+    #        case.target.package + "/" + case.target.activity]
+    cmd = base_cmd
     print cmd
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     p.wait()
@@ -89,11 +111,3 @@ if __name__ == '__main__':
     print erroutput
     stop_cmd = ['adb', 'shell', 'am', 'force-stop', 'com.alensw.PicFolder']
     subprocess.Popen(stop_cmd)
-    # adb
-    # shell
-    # am
-    # start - W - a
-    # android.intent.action.SEND_MULTIPLE - d
-    # file: // / mnt / sdcard / Download / nexusx_1920x1080.png - c
-    # android.intent.category.DEFAULT
-    # com.alensw.PicFolder / com.alensw.transfer.TransferActivity

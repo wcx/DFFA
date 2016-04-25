@@ -23,7 +23,7 @@ class TestTarget(object):
 
     @property
     def file_name(self):
-        return self.file_name
+        return self._file_name
 
     @property
     def mime_type(self):
@@ -44,3 +44,8 @@ class TestTarget(object):
     @property
     def seed(self):
         return self._seed
+
+
+if __name__ == '__main__':
+    target = TestTarget("com.test", "com.test.act", "*/*", "/sd/a/a.jpg", "piuk", "123", "1.01", "~/")
+    print target.mime_type
