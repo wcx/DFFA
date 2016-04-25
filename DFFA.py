@@ -10,7 +10,9 @@
 """
 import os
 
+from transwarp.db import MySQLHelper
 from utils.utils import *
+from pretreatment.target import TestTarget
 
 
 def push_files():
@@ -65,5 +67,33 @@ def main():
     print_symbol("Done removing")
 
 
+class TestCase(object):
+    def __init__(self, target, mutant_file):
+        self.target = target
+        self.mutant_file = mutant_file
+
+
 if __name__ == '__main__':
-    main()
+    sqlhelper = MySQLHelper()
+    target = sqlhelper.query_target()
+    sqlhelper.close()
+    print target.activity
+    case = TestCase(target, "file:///mnt/sdcard/Download/nexusx_1920x1080.png")
+    cmd = ['adb', 'shell', 'am', 'start', '-W', '-a', 'android.intent.action.SEND_MULTIPLE', '-d', case.mutant_file,
+           case.target.package + "/" + case.target.activity]
+    print cmd
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p.wait()
+    (stdoutput, erroutput) = p.communicate()
+    # print stdoutput
+    print erroutput
+    stop_cmd = ['adb', 'shell', 'am', 'force-stop', 'com.alensw.PicFolder']
+    subprocess.Popen(stop_cmd)
+    # adb
+    # shell
+    # am
+    # start - W - a
+    # android.intent.action.SEND_MULTIPLE - d
+    # file: // / mnt / sdcard / Download / nexusx_1920x1080.png - c
+    # android.intent.category.DEFAULT
+    # com.alensw.PicFolder / com.alensw.transfer.TransferActivity

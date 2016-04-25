@@ -12,3 +12,6 @@ class TestTarget(object):
         self.version_code = version_code
         self.version_name = version_name
         self.seed = seed
+
+
+

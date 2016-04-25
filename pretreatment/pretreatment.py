@@ -59,6 +59,7 @@ def parse_apk(apk_path, sqlhelper):
 
 def parse_apks(base_path):
     sqlhelper = MySQLHelper()
+    sqlhelper.init()
     local_path = base_path
     files = os.listdir(local_path)
     apk_paths = [local_path + '/' + f for f in files]
