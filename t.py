@@ -25,5 +25,4 @@ p2 = subprocess.Popen(
     shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 (stdoutput, erroutput) = p2.communicate()
-print p2.poll()
 print stdoutput

@@ -1,0 +1,25 @@
+--------- beginning of main
+--------- beginning of system
+04-26 01:21:04.501 E/KLog.ERROR( 7577): [7577-7617] [scan] Not login, stop scanning all cloud data
+--------- beginning of crash
+04-26 01:21:04.548 E/AndroidRuntime( 7547): FATAL EXCEPTION: main
+04-26 01:21:04.548 E/AndroidRuntime( 7547): Process: com.alensw.PicFolder, PID: 7547
+04-26 01:21:04.548 E/AndroidRuntime( 7547): java.lang.RuntimeException: Unable to start activity ComponentInfo{com.alensw.PicFolder/com.alensw.transfer.TransferActivity}: java.lang.NullPointerException: Attempt to invoke interface method 'java.lang.Object[] java.util.Collection.toArray()' on a null object reference
+04-26 01:21:04.548 E/AndroidRuntime( 7547): 	at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:2416)
+04-26 01:21:04.548 E/AndroidRuntime( 7547): 	at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:2476)
+04-26 01:21:04.548 E/AndroidRuntime( 7547): 	at android.app.ActivityThread.-wrap11(ActivityThread.java)
+04-26 01:21:04.548 E/AndroidRuntime( 7547): 	at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1344)
+04-26 01:21:04.548 E/AndroidRuntime( 7547): 	at android.os.Handler.dispatchMessage(Handler.java:102)
+04-26 01:21:04.548 E/AndroidRuntime( 7547): 	at android.os.Looper.loop(Looper.java:148)
+04-26 01:21:04.548 E/AndroidRuntime( 7547): 	at android.app.ActivityThread.main(ActivityThread.java:5417)
+04-26 01:21:04.548 E/AndroidRuntime( 7547): 	at java.lang.reflect.Method.invoke(Native Method)
+04-26 01:21:04.548 E/AndroidRuntime( 7547): 	at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:726)
+04-26 01:21:04.548 E/AndroidRuntime( 7547): 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:616)
+04-26 01:21:04.548 E/AndroidRuntime( 7547): Caused by: java.lang.NullPointerException: Attempt to invoke interface method 'java.lang.Object[] java.util.Collection.toArray()' on a null object reference
+04-26 01:21:04.548 E/AndroidRuntime( 7547): 	at java.util.ArrayList.addAll(ArrayList.java:188)
+04-26 01:21:04.548 E/AndroidRuntime( 7547): 	at com.alensw.transfer.ac.a(Unknown Source)
+04-26 01:21:04.548 E/AndroidRuntime( 7547): 	at com.alensw.transfer.TransferActivity.onCreate(Unknown Source)
+04-26 01:21:04.548 E/AndroidRuntime( 7547): 	at android.app.Activity.performCreate(Activity.java:6251)
+04-26 01:21:04.548 E/AndroidRuntime( 7547): 	at android.app.Instrumentation.callActivityOnCreate(Instrumentation.java:1107)
+04-26 01:21:04.548 E/AndroidRuntime( 7547): 	at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:2369)
+04-26 01:21:04.548 E/AndroidRuntime( 7547): 	... 9 more

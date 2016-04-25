@@ -92,22 +92,27 @@ if __name__ == '__main__':
     sqlhelper = MySQLHelper()
     target = sqlhelper.query_target()
     sqlhelper.close()
-
     mutant_file = "file:///mnt/sdcard/Download/nexusx_1920x1080.png"
     case = TestCase(target, mutant_file)
-    base_cmd = ['adb', 'shell', 'am', 'start', '-W', '-S']
-    base_cmd.extend(['-a', 'android.intent.action.SEND_MULTIPLE'])
-    base_cmd.extend(['-t', case.target.mime_type])
-    base_cmd.extend(['-d', case.mutant_file])
-    base_cmd.append(case.target.package + "/" + case.target.activity)
-    # cmd = ['adb', 'shell', 'am', 'start', '-W', '-a', 'android.intent.action.SEND_MULTIPLE', '-d', case.mutant_file,
-    #        case.target.package + "/" + case.target.activity]
-    cmd = base_cmd
-    print cmd
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    p.wait()
-    (stdoutput, erroutput) = p.communicate()
-    # print stdoutput
-    print erroutput
-    stop_cmd = ['adb', 'shell', 'am', 'force-stop', 'com.alensw.PicFolder']
-    subprocess.Popen(stop_cmd)
+
+    open_cmd = ['adb', 'shell', 'am', 'start', '-W', '-S']
+    open_cmd.extend(['-a', 'android.intent.action.SEND_MULTIPLE'])
+    open_cmd.extend(['-t', 'image/*'])
+    open_cmd.extend(['-d', case.mutant_file])
+    open_cmd.append(case.target.package + "/" + case.target.activity)
+
+    log_clean_cmd = ['adb', 'logcat', '-c']
+    print'执行:' + to_cmd_str(log_clean_cmd)
+    p1 = subprocess.Popen(to_cmd_str(log_clean_cmd), shell=True)
+    p1.wait()
+
+    print'执行:' + to_cmd_str(open_cmd)
+    try:
+        timeout_cmd(to_cmd_str(open_cmd),timeout=3)
+    except TimeoutError as e:
+        print e
+        # subprocess.Popen(to_cmd_str(open_cmd),shell=True)
+
+    log_cmd = ['adb', 'logcat', '-d', '-v', 'time', '*:E', '>', 'res/logs/log.txt']
+    print'执行:' + to_cmd_str(log_cmd)
+    subprocess.Popen(to_cmd_str(log_cmd), shell=True)
