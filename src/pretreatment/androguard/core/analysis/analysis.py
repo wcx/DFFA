@@ -15,12 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import re, random, cPickle, collections
+import collections
+import re
 
-from androguard.core.androconf import error, warning, debug, is_ascii_problem,\
-    load_api_specific_resource_module
-from androguard.core.bytecodes import dvm
-from androguard.core.bytecodes.api_permissions import DVM_PERMISSIONS_BY_PERMISSION, DVM_PERMISSIONS_BY_ELEMENT
+from androguard.core.androconf import warning, debug, is_ascii_problem
+
+from src.pretreatment.androguard.core.bytecodes import dvm
+
 
 class DVMBasicBlock(object):
     """

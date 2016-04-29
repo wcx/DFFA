@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import MySQLdb
 import warnings
 
-from pretreatment.target import TestTarget
+import MySQLdb
+
+from src.pretreatment.target import TestTarget
 
 warnings.filterwarnings("ignore")
 
@@ -57,7 +58,7 @@ class MySQLHelper:
               "app_name varchar(30)," \
               "version_code varchar(30)," \
               "version_name varchar(30)," \
-              "seed varchar(60))" \
+              "seeds varchar(60))" \
             .format(self.table)
 
         self.cur.execute(sql)
@@ -136,7 +137,7 @@ class MySQLHelper:
 if __name__ == '__main__':
     sqlhelper = MySQLHelper()
     # p_data = {'package': "com.test", 'activity': "com.test.act", 'file_name': "/sd/a/a.jpg", 'app_name': "piuk",
-    #           'version_code': "123", "version_name": "1.01", "seed": "~/"}
+    #           'version_code': "123", "version_name": "1.01", "seeds": "~/"}
     # n = sqlhelper.insert(sqlhelper.TABLE_TARGET, p_data)
     print sqlhelper.query_target()
     sqlhelper.close()

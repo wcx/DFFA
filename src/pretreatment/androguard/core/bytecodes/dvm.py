@@ -16,7 +16,7 @@
 # limitations under the License.
 
 from androguard.core import bytecode
-from androguard.core.bytecodes.apk import APK
+from src.pretreatment.androguard.core.bytecodes import APK
 from androguard.core.androconf import CONF, debug, warning
 
 import sys

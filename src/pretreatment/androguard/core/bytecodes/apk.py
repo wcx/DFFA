@@ -15,22 +15,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from androguard.core import bytecode
-from androguard.core import androconf
-from androguard.core.bytecodes.dvm_permissions import DVM_PERMISSIONS
-from androguard.util import read
-
-from androguard.core.resources import public
-
 import StringIO
+import collections
+import re
+import sys
 from struct import pack, unpack
+from xml.dom import minidom
 from xml.sax.saxutils import escape
 from zlib import crc32
-import re
-import collections
-import sys
 
-from xml.dom import minidom
+from androguard.core import bytecode
+from androguard.core.bytecodes.dvm_permissions import DVM_PERMISSIONS
+from androguard.core.resources import public
+from androguard.util import read
+
+from src.pretreatment.androguard.core import androconf
 
 NS_ANDROID_URI = 'http://schemas.android.com/apk/res/android'
 

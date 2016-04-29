@@ -1,7 +1,10 @@
+### custom ###
 nohup.out
-files/*
 *.bak
 *.pyc
+/res/apks/*
+/res/logs/*
+/res/seeds/*
 
 # Created by https://www.gitignore.io/api/linux,pycharm,python
 

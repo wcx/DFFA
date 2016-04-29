@@ -10,10 +10,11 @@
 """
 import os
 
+from src.pretreatment.target import TestTarget
 from transwarp.db import MySQLHelper
 from utils.utils import *
 
-
+RES_PATH='..+/res'
 def push_files():
     '''
     向android devices push files
@@ -89,9 +90,12 @@ class TestCase(object):
 
 
 if __name__ == '__main__':
-    sqlhelper = MySQLHelper()
-    target = sqlhelper.query_target()
-    sqlhelper.close()
+    # sqlhelper = MySQLHelper()
+    # target = sqlhelper.query_target()
+    # sqlhelper.close()
+
+    target = TestTarget('com.alensw.PicFolder', 'com.alensw.transfer.TransferActivity', '*/*', 'foo', 'pic', '11', '22',
+                        'test/')
     mutant_file = "file:///mnt/sdcard/Download/nexusx_1920x1080.png"
     case = TestCase(target, mutant_file)
 
@@ -113,6 +117,6 @@ if __name__ == '__main__':
         print e
         # subprocess.Popen(to_cmd_str(open_cmd),shell=True)
 
-    log_cmd = ['adb', 'logcat', '-d', '-v', 'time', '*:E', '>', 'res/logs/log.txt']
+    log_cmd = ['adb', 'logcat', '-d', '-v', 'time', '*:E', '>', '../res/logs/log.txt']
     print'执行:' + to_cmd_str(log_cmd)
     subprocess.Popen(to_cmd_str(log_cmd), shell=True)

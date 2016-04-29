@@ -15,17 +15,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 import Queue
+import os
 import threading
 import time
 import zlib
 
-from androguard.core import androconf
-from androguard.core.bytecodes import apk, dvm
 from androguard.core.analysis import analysis
 from androguard.core.androconf import debug
+from androguard.core.bytecodes import apk, dvm
 from androguard.util import read
+
+from src.pretreatment.androguard.core import androconf
 
 
 class AndroAuto(object):

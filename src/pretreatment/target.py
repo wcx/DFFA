@@ -42,8 +42,8 @@ class TestTarget(object):
         #     return self.version_name
         #
         # @property
-        # def seed(self):
-        #     return self.seed
+        # def seeds(self):
+        #     return self.seeds
 
 
 if __name__ == '__main__':
