@@ -108,7 +108,7 @@ if __name__ == '__main__':
 
     print'执行:' + to_cmd_str(open_cmd)
     try:
-        timeout_cmd(to_cmd_str(open_cmd),timeout=3)
+        timeout_cmd(to_cmd_str(open_cmd), timeout=3)
     except TimeoutError as e:
         print e
         # subprocess.Popen(to_cmd_str(open_cmd),shell=True)

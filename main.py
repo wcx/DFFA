@@ -252,6 +252,7 @@ def fuzz(log_dir='logs'):
     logs = open_files(files, log_dir=log_dir)
     return logs, files
 
+
 # def examine_logs(log_dir):
 # if log_dir[-1] != '/': # should make a decorator
 #         log_dir += '/'
@@ -274,6 +275,7 @@ def main():
     # examine_logs(log_dir)
     print "Done logging"
     cleanup(fuzz_files)
+
 
 if __name__ == '__main__':
     main()
