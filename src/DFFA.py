@@ -14,7 +14,9 @@ from src.pretreatment.target import TestTarget
 from transwarp.db import MySQLHelper
 from utils.utils import *
 
-RES_PATH='..+/res'
+RES_PATH = '..+/res'
+
+
 def push_files():
     '''
     向android devices push files
@@ -48,6 +50,9 @@ def cleanup(files):
     '''
     rm_cmd = ['adb', 'shell', 'rm', '-r'] + files
     return popen_wait(rm_cmd)
+
+def get_uni_crash():
+    pass
 
 
 def main():
@@ -94,29 +99,30 @@ if __name__ == '__main__':
     # target = sqlhelper.query_target()
     # sqlhelper.close()
 
-    target = TestTarget('com.alensw.PicFolder', 'com.alensw.transfer.TransferActivity', '*/*', 'foo', 'pic', '11', '22',
-                        'test/')
-    mutant_file = "file:///mnt/sdcard/Download/nexusx_1920x1080.png"
-    case = TestCase(target, mutant_file)
+    for i in range(3):
+        target = TestTarget('com.alensw.PicFolder', 'com.alensw.transfer.TransferActivity', '*/*', 'foo', 'pic', '11',
+                            '22',
+                            'test/')
+        mutant_file = "file:///mnt/sdcard/Download/nexusx_1920x1080.png"
+        case = TestCase(target, mutant_file)
+        open_cmd = ['adb', 'shell', 'am', 'start', '-W', '-S']
+        open_cmd.extend(['-a', 'android.intent.action.SEND_MULTIPLE'])
+        open_cmd.extend(['-t', 'image/*'])
+        open_cmd.extend(['-d', case.mutant_file])
+        open_cmd.append(case.target.package + "/" + case.target.activity)
 
-    open_cmd = ['adb', 'shell', 'am', 'start', '-W', '-S']
-    open_cmd.extend(['-a', 'android.intent.action.SEND_MULTIPLE'])
-    open_cmd.extend(['-t', 'image/*'])
-    open_cmd.extend(['-d', case.mutant_file])
-    open_cmd.append(case.target.package + "/" + case.target.activity)
+        log_clean_cmd = ['adb', 'logcat', '-c']
+        print'执行:' + to_cmd_str(log_clean_cmd)
+        p1 = subprocess.Popen(to_cmd_str(log_clean_cmd), shell=True)
+        p1.wait()
 
-    log_clean_cmd = ['adb', 'logcat', '-c']
-    print'执行:' + to_cmd_str(log_clean_cmd)
-    p1 = subprocess.Popen(to_cmd_str(log_clean_cmd), shell=True)
-    p1.wait()
+        print'执行:' + to_cmd_str(open_cmd)
+        try:
+            timeout_cmd(to_cmd_str(open_cmd), timeout=3)
+        except TimeoutError as e:
+            print e
+            # subprocess.Popen(to_cmd_str(open_cmd),shell=True)
 
-    print'执行:' + to_cmd_str(open_cmd)
-    try:
-        timeout_cmd(to_cmd_str(open_cmd), timeout=3)
-    except TimeoutError as e:
-        print e
-        # subprocess.Popen(to_cmd_str(open_cmd),shell=True)
-
-    log_cmd = ['adb', 'logcat', '-d', '-v', 'time', '*:E', '>', '../res/logs/log.txt']
-    print'执行:' + to_cmd_str(log_cmd)
-    subprocess.Popen(to_cmd_str(log_cmd), shell=True)
+        log_cmd = ['adb', 'logcat', '-d', '-v', 'time', '*:E', '>', '../res/logs/log.txt']
+        print'执行:' + to_cmd_str(log_cmd)
+        subprocess.Popen(to_cmd_str(log_cmd), shell=True)
