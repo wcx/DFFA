@@ -2,9 +2,9 @@
 nohup.out
 *.bak
 *.pyc
-/res/apks/*
-/res/logs/*
-/res/seeds/*
+/res/apks/*.apk
+/res/logs/*.txt
+/res/seeds/*.png
 
 # Created by https://www.gitignore.io/api/linux,pycharm,python
 
