@@ -18,16 +18,17 @@ RES_PATH = '..+/res'
 
 
 def push_files():
-    '''
-    向android devices push files
-    '''
-    local_path = 'files/pdfs'
-    remote_path = '/mnt/sdcard/FuzzDownload'
-    cmd = ['adb', 'push', local_path, remote_path]
-    popen_wait(cmd)
-    files = os.listdir(local_path)
-    remote_files = [remote_path + '/' + file for file in files]
-    return remote_files
+    pass
+    # '''
+    # 向android devices push files
+    # '''
+    # local_path = 'files/pdfs'
+    # remote_path = '/mnt/sdcard/FuzzDownload'
+    # cmd = ['adb', 'push', local_path, remote_path]
+    # popen_wait(cmd)
+    # files = os.listdir(local_path)
+    # remote_files = [remote_path + '/' + file for file in files]
+    # return remote_files
 
 
 def open_file(files):
@@ -50,6 +51,7 @@ def cleanup(files):
     '''
     rm_cmd = ['adb', 'shell', 'rm', '-r'] + files
     return popen_wait(rm_cmd)
+
 
 def get_uni_crash():
     pass
@@ -94,17 +96,25 @@ class TestCase(object):
         self._target = value
 
 
+def push_mutant_files():
+    pass
+
+
 if __name__ == '__main__':
     # sqlhelper = MySQLHelper()
     # target = sqlhelper.query_target()
     # sqlhelper.close()
 
-    for i in range(3):
-        target = TestTarget('com.alensw.PicFolder', 'com.alensw.transfer.TransferActivity', '*/*', 'foo', 'pic', '11',
-                            '22',
-                            'test/')
-        mutant_file = "file:///mnt/sdcard/Download/nexusx_1920x1080.png"
-        case = TestCase(target, mutant_file)
+    target = TestTarget('com.alensw.PicFolder', 'com.alensw.transfer.TransferActivity', '*/*', 'foo', 'pic', '11',
+                        '22',
+                        'test/')
+    mutant_file = "file:///mnt/sdcard/Download/nexusx_1920x1080.png"
+    push_mutant_files()
+
+    cases = list()
+    cases.append(TestCase(target, mutant_file))
+    cases.append(TestCase(target, mutant_file))
+    for i, case in enumerate(cases):
         open_cmd = ['adb', 'shell', 'am', 'start', '-W', '-S']
         open_cmd.extend(['-a', 'android.intent.action.SEND_MULTIPLE'])
         open_cmd.extend(['-t', 'image/*'])
@@ -121,8 +131,8 @@ if __name__ == '__main__':
             timeout_cmd(to_cmd_str(open_cmd), timeout=3)
         except TimeoutError as e:
             print e
-            # subprocess.Popen(to_cmd_str(open_cmd),shell=True)
 
-        log_cmd = ['adb', 'logcat', '-d', '-v', 'time', '*:E', '>', '../res/logs/log.txt']
+        log_cmd = ['adb', 'logcat', '-d', '-v', 'time', '*:E', '>',
+                   '../res/logs/' + 'log' + time.time().__str__() + '.txt']
         print'执行:' + to_cmd_str(log_cmd)
         subprocess.Popen(to_cmd_str(log_cmd), shell=True)
