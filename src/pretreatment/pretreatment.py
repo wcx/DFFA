@@ -7,11 +7,42 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 
 import os
+from src.transwarp.db import MySQLHelper
 from androguard.core.bytecodes import apk
-from target import TestTarget
-from transwarp.db import MySQLHelper
+from models import TestTarget, IntentFilter
 
-BASE_APK_PATH = "/home/wcx/Download/apk"
+BASE_APK_PATH = "../../res/apks"
+
+
+def get_attributes(sitem, tag, attribute):
+    s = set()
+    for ssitem in sitem.getElementsByTagName(tag):
+        val = ssitem.getAttributeNS(apk.NS_ANDROID_URI, attribute)
+        if val != '':
+            s.add(val)
+    return s
+
+
+def get_target_mime(mime_types):
+    target_mime = set()
+    for t in mime_types:
+        if t.startswith("image/") or t.startswith("video/") or t.startswith("*/"):
+            if t == "image/*":
+                target_mime.add("image/gif")
+                target_mime.add("image/jpg")
+                target_mime.add("image/png")
+            elif t == "video/*":
+                target_mime.add("video/mp3")
+                target_mime.add("video/mp4")
+            elif t == "*/*":
+                target_mime.add("image/gif")
+                target_mime.add("image/jpg")
+                target_mime.add("image/png")
+                target_mime.add("video/mp3")
+                target_mime.add("video/mp4")
+            elif t == "image/gif" or t == "image/jpg" or t == "image/png" or t == "video/mp3" or t == "video/mp4":
+                target_mime.add(t)
+    return target_mime
 
 
 def get_mime_types(apkf):
@@ -19,16 +50,16 @@ def get_mime_types(apkf):
     for i in apkf.xml:
         for j, item in enumerate(apkf.xml[i].getElementsByTagName("activity")):
             activity = item.getAttributeNS(apk.NS_ANDROID_URI, "name")
-            mime_types = set()
             for sitem in item.getElementsByTagName("intent-filter"):
-                for ssitem in sitem.getElementsByTagName("data"):
-                    val = ssitem.getAttributeNS(apk.NS_ANDROID_URI, "mimeType")
-                    if val != '':
-                        mime_types.add(val)
-            # 添加activity以及对应的mime types
-            if mime_types:
-                print "activity:" + apkf.format_value(activity) + "||||types:" + mime_types.__str__()
-                d.update({apkf.format_value(activity): mime_types})
+                actions = get_attributes(sitem, "action", "name")
+                categorys = get_attributes(sitem, "category", "name")
+                mime_types = get_target_mime(get_attributes(sitem, "data", "mimeType"))
+                # 添加activity以及对应的mime types
+                if mime_types:
+                    d.update({apkf.format_value(activity): IntentFilter(actions, categorys, mime_types)})
+                    print "activity:" + apkf.format_value(
+                        activity) + "\ntypes:" + mime_types.__str__() + "\nactions:" + actions.__str__() + "\ncategory:" + categorys.__str__()
+                    print "-------"
         print "activity number:" + len(d).__str__() + "||||" + d.__str__()
     return d
 
@@ -43,9 +74,16 @@ def to_targets(apk_path):
     targets = set()
     print "---开始---target convert---"
     for activity in d:
-        for mime_type in d[activity]:
-            targets.add(TestTarget(apkf.get_package(), activity, mime_type, apkf.get_filename(), apkf.get_app_name(),
-                                   apkf.get_androidversion_code(), apkf.get_androidversion_name(), "~/home"))
+        intent_filter = d[activity]
+        for mime_type in intent_filter.mime_types:
+            for action in intent_filter.actions:
+                for category in intent_filter.categorys:
+                    targets.add(
+                        TestTarget(apkf.get_package(), activity, action, category, mime_type, apkf.get_filename(),
+                                   apkf.get_app_name(),
+                                   apkf.get_androidversion_code(), apkf.get_androidversion_name(),
+                                   "~/home"))
+
     print "---结束---target convert---"
     return targets
 
@@ -62,7 +100,12 @@ def parse_apks(base_path):
     sqlhelper.init()
     local_path = base_path
     files = os.listdir(local_path)
-    apk_paths = [local_path + '/' + f for f in files]
+
+    apk_paths = []
+    for f in files:
+        if f.endswith('.apk'):
+            apk_paths.append(local_path + '/' + f)
+
     print "----------------------------------共" + len(apk_paths).__str__() + "个待解析APK------------------------------"
     for i, path in enumerate(apk_paths):
         print "-----------------开始解析第" + str(i + 1) + "个APK:" + path + "----------------------"

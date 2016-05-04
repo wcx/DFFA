@@ -5,6 +5,8 @@ nohup.out
 /res/apks/*.apk
 /res/logs/*.txt
 /res/seeds/*.png
+/res/seeds/*.gif
+/res/seeds/*.jpg
 
 # Created by https://www.gitignore.io/api/linux,pycharm,python
 

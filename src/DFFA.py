@@ -10,7 +10,7 @@
 """
 import os
 
-from src.pretreatment.target import TestTarget
+from src.pretreatment.models import TestTarget
 from transwarp.db import MySQLHelper
 from utils.utils import *
 

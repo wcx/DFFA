@@ -4,7 +4,7 @@ import warnings
 
 import MySQLdb
 
-from src.pretreatment.target import TestTarget
+from src.pretreatment.models import TestTarget
 
 warnings.filterwarnings("ignore")
 
@@ -53,12 +53,14 @@ class MySQLHelper:
               "(id int not null primary key auto_increment," \
               "package varchar(30)," \
               "activity varchar(60)," \
+              "action varchar(60)," \
+              "category varchar(60)," \
               "mime_type varchar(60)," \
               "file_name varchar(30)," \
               "app_name varchar(30)," \
               "version_code varchar(30)," \
               "version_name varchar(30)," \
-              "seeds varchar(60))" \
+              "seed varchar(60))" \
             .format(self.table)
 
         self.cur.execute(sql)
