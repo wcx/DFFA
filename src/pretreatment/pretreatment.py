@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 import sys
 
+from src.transwarp.db import MySQLHelper
+
 sys.path.append('../../')
 reload(sys)
 sys.setdefaultencoding('utf8')
@@ -9,9 +11,8 @@ sys.setdefaultencoding('utf8')
 import os
 from androguard.core.bytecodes import apk
 from target import TestTarget
-from transwarp.db import MySQLHelper
 
-BASE_APK_PATH = "/home/wcx/Download/apk"
+BASE_APK_PATH = "../../apks"
 
 
 def get_mime_types(apkf):
