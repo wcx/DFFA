@@ -101,11 +101,13 @@ def push_mutant_files():
 
 
 if __name__ == '__main__':
-    # sqlhelper = MySQLHelper()
-    # target = sqlhelper.query_target()
-    # sqlhelper.close()
+    sqlhelper = MySQLHelper()
+    target = sqlhelper.query_target()
+    sqlhelper.close()
 
-    target = TestTarget('com.alensw.PicFolder', 'com.alensw.transfer.TransferActivity', '*/*', 'foo', 'pic', '11',
+    target = TestTarget('com.alensw.PicFolder', 'com.alensw.transfer.TransferActivity',
+                        'android.intent.action.SEND_MULTIPLE', 'android.intent.category.DEFAULT', '*/*', 'foo', 'pic',
+                        '11',
                         '22',
                         'test/')
     mutant_file = "file:///mnt/sdcard/Download/nexusx_1920x1080.png"
@@ -116,8 +118,9 @@ if __name__ == '__main__':
     cases.append(TestCase(target, mutant_file))
     for i, case in enumerate(cases):
         open_cmd = ['adb', 'shell', 'am', 'start', '-W', '-S']
-        open_cmd.extend(['-a', 'android.intent.action.SEND_MULTIPLE'])
-        open_cmd.extend(['-t', 'image/*'])
+        open_cmd.extend(['-a', target.action])
+        open_cmd.extend(['-c', target.category])
+        open_cmd.extend(['-t', target.mime_type])
         open_cmd.extend(['-d', case.mutant_file])
         open_cmd.append(case.target.package + "/" + case.target.activity)
 

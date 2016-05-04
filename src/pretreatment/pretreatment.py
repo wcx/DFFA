@@ -12,6 +12,7 @@ from androguard.core.bytecodes import apk
 from models import TestTarget, IntentFilter
 
 BASE_APK_PATH = "../../res/apks"
+BASE_SEED_PATH = "../../res/seeds"
 
 
 def get_attributes(sitem, tag, attribute):
@@ -64,6 +65,20 @@ def get_mime_types(apkf):
     return d
 
 
+def get_seed(mime_type):
+    if mime_type == "image/gif":
+        seed = BASE_SEED_PATH + "input.gif"
+    if mime_type == "image/jpg":
+        seed = BASE_SEED_PATH + "input.jpg"
+    if mime_type == "image/png":
+        seed = BASE_SEED_PATH + "input.png"
+    if mime_type == "video/mp3":
+        seed = BASE_SEED_PATH + "input.mp3"
+    if mime_type == "video/mp4":
+        seed = BASE_SEED_PATH + "input.mp4"
+    return os.path.realpath(seed)
+
+
 def to_targets(apk_path):
     apkf = apk.APK(apk_path)
     print "------------------appname:" + apkf.get_app_name() + "---------------------"
@@ -76,13 +91,15 @@ def to_targets(apk_path):
     for activity in d:
         intent_filter = d[activity]
         for mime_type in intent_filter.mime_types:
+            seed = get_seed(mime_type)
             for action in intent_filter.actions:
                 for category in intent_filter.categorys:
                     targets.add(
-                        TestTarget(apkf.get_package(), activity, action, category, mime_type, apkf.get_filename(),
+                        TestTarget(apkf.get_package(), activity, action, category, mime_type,
+                                   os.path.realpath(apkf.get_filename()),
                                    apkf.get_app_name(),
                                    apkf.get_androidversion_code(), apkf.get_androidversion_name(),
-                                   "~/home"))
+                                   seed))
 
     print "---结束---target convert---"
     return targets
