@@ -58,7 +58,7 @@ class MySQLHelper:
               "app_name varchar(30)," \
               "version_code varchar(30)," \
               "version_name varchar(30)," \
-              "seeds varchar(60))" \
+              "seed varchar(60))" \
             .format(self.table)
 
         self.cur.execute(sql)

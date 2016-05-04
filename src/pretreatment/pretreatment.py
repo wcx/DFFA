@@ -12,7 +12,7 @@ import os
 from androguard.core.bytecodes import apk
 from target import TestTarget
 
-BASE_APK_PATH = "../../apks"
+BASE_APK_PATH = "../../res/apks"
 
 
 def get_mime_types(apkf):
