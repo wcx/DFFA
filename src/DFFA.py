@@ -14,7 +14,7 @@ from src.pretreatment.models import TestTarget
 from transwarp.db import MySQLHelper
 from utils.utils import *
 
-RES_PATH = '..+/res'
+RES_PATH = '../res'
 
 
 def push_files():
@@ -100,27 +100,13 @@ def push_mutant_files():
     pass
 
 
-if __name__ == '__main__':
-    sqlhelper = MySQLHelper()
-    target = sqlhelper.query_target()
-    sqlhelper.close()
-
-    target = TestTarget('com.alensw.PicFolder', 'com.alensw.transfer.TransferActivity',
-                        'android.intent.action.SEND_MULTIPLE', 'android.intent.category.DEFAULT', '*/*', 'foo', 'pic',
-                        '11',
-                        '22',
-                        'test/')
-    mutant_file = "file:///mnt/sdcard/Download/nexusx_1920x1080.png"
-    push_mutant_files()
-
-    cases = list()
-    cases.append(TestCase(target, mutant_file))
-    cases.append(TestCase(target, mutant_file))
+def run_campaign(cases):
     for i, case in enumerate(cases):
+        print '----------------' + i.__str__() + '------------------------'
         open_cmd = ['adb', 'shell', 'am', 'start', '-W', '-S']
-        open_cmd.extend(['-a', target.action])
-        open_cmd.extend(['-c', target.category])
-        open_cmd.extend(['-t', target.mime_type])
+        open_cmd.extend(['-a', case.target.action])
+        open_cmd.extend(['-c', case.target.category])
+        open_cmd.extend(['-t', case.target.mime_type])
         open_cmd.extend(['-d', case.mutant_file])
         open_cmd.append(case.target.package + "/" + case.target.activity)
 
@@ -139,3 +125,33 @@ if __name__ == '__main__':
                    '../res/logs/' + 'log' + time.time().__str__() + '.txt']
         print'执行:' + to_cmd_str(log_cmd)
         subprocess.Popen(to_cmd_str(log_cmd), shell=True)
+        print '-----------------------------------------'
+
+
+if __name__ == '__main__':
+    sqlhelper = MySQLHelper()
+    target = sqlhelper.query_target()
+    sqlhelper.close()
+
+    target = TestTarget('com.alensw.PicFolder', 'com.alensw.transfer.TransferActivity',
+                        'android.intent.action.SEND_MULTIPLE', 'android.intent.category.DEFAULT', 'image/*', 'foo',
+                        'pic',
+                        '11',
+                        '22',
+                        'test/')
+    mutant_file = "file:///mnt/sdcard/Download/nexusx_1920x1080.png"
+    target1 = TestTarget('com.alensw.PicFolder', 'com.alensw.transfer.TransferActivity',
+                         'android.intent.action.SEND', 'android.intent.category.DEFAULT', 'image/*', 'foo', 'pic',
+                         '11',
+                         '22',
+                         'test/')
+    push_mutant_files()
+
+    cases = list()
+    cases.append(TestCase(target, mutant_file))
+    cases.append(TestCase(target1, mutant_file))
+    cases.append(TestCase(target, mutant_file))
+    cases.append(TestCase(target1, mutant_file))
+    cases.append(TestCase(target, mutant_file))
+
+    run_campaign(cases)
