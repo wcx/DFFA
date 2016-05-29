@@ -102,36 +102,35 @@ def push_mutant_files():
 
 def run_campaign(cases):
     for i, case in enumerate(cases):
-        print '----------------' + i.__str__() + '------------------------'
+        print_symbol(i.__str__())
         open_cmd = ['adb', 'shell', 'am', 'start', '-W', '-S']
         open_cmd.extend(['-a', case.target.action])
         open_cmd.extend(['-c', case.target.category])
         open_cmd.extend(['-t', case.target.mime_type])
         open_cmd.extend(['-d', case.mutant_file])
         open_cmd.append(case.target.package + "/" + case.target.activity)
-
+        #清空日志
         log_clean_cmd = ['adb', 'logcat', '-c']
         print'执行:' + to_cmd_str(log_clean_cmd)
-        p1 = subprocess.Popen(to_cmd_str(log_clean_cmd), shell=True)
-        p1.wait()
-
+        popen_wait(log_clean_cmd)
+        #执行用例
         print'执行:' + to_cmd_str(open_cmd)
         try:
-            timeout_cmd(to_cmd_str(open_cmd), timeout=3)
+            timeout_cmd(open_cmd, timeout=3)
         except TimeoutError as e:
             print e
-
+        #记录日志
         log_cmd = ['adb', 'logcat', '-d', '-v', 'time', '*:E', '>',
                    '../res/logs/' + 'log' + time.time().__str__() + '.txt']
         print'执行:' + to_cmd_str(log_cmd)
-        subprocess.Popen(to_cmd_str(log_cmd), shell=True)
-        print '-----------------------------------------'
+        popen_wait(log_cmd)
+        print_symbol()
 
 
 if __name__ == '__main__':
-    sqlhelper = MySQLHelper()
-    target = sqlhelper.query_target()
-    sqlhelper.close()
+    # sqlhelper = MySQLHelper()
+    # target = sqlhelper.query_target()
+    # sqlhelper.close()
 
     target = TestTarget('com.alensw.PicFolder', 'com.alensw.transfer.TransferActivity',
                         'android.intent.action.SEND_MULTIPLE', 'android.intent.category.DEFAULT', 'image/*', 'foo',
@@ -150,8 +149,8 @@ if __name__ == '__main__':
     cases = list()
     cases.append(TestCase(target, mutant_file))
     cases.append(TestCase(target1, mutant_file))
-    cases.append(TestCase(target, mutant_file))
-    cases.append(TestCase(target1, mutant_file))
-    cases.append(TestCase(target, mutant_file))
+    # cases.append(TestCase(target, mutant_file))
+    # cases.append(TestCase(target1, mutant_file))
+    # cases.append(TestCase(target, mutant_file))
 
     run_campaign(cases)
