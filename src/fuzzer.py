@@ -94,7 +94,7 @@ def replace_with_1(bit_array):
 
 
 def replace_with_0(bit_array):
-    print 'replace_with_2'
+    print 'replace_with_0'
     return replace(bit_array, mode=0)
 
 
@@ -111,7 +111,18 @@ def fuzz(**kwargs):
         with open('test' + time.time().__str__() + '.png', 'wb') as output:
             print '生成' + output.name
             mutant_bit_array.tofile(output)
-
+def test(**kwargs):
+    operators = {0: remove, 1: add, 2: replace, 3: replace_with_1, 4: replace_with_0}
+    if kwargs.get("seedfile", False):
+        # 读入文件的二进制
+        with open(kwargs["seedfile"], 'rb') as f:
+            bit_array = BitArray(f)
+        # 随机选取一种变异算子进行变异
+        mutant_bit_array = operators.get(random.randint(0, operators.__len__() - 1))(bit_array)
+        # 写入变异后的文件
+        with open('test' + time.time().__str__() + '.png', 'wb') as output:
+            print '生成' + output.name
+            mutant_bit_array.tofile(output)
 
 if __name__ == '__main__':
     fuzz(seedfile='Lenna.png')
