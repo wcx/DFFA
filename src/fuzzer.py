@@ -24,10 +24,10 @@ def get_bits(length, mode=-1):
         bin_str = '0b' + bits.bin
     else:
         # print 'all_1_bit:bin:' + bits.bin
-        print 'all_1_bit:uint:' + bits.uint.__str__()
+        # print 'all_1_bit:uint:' + bits.uint.__str__()
         # 生成随机数，0到最大值
         random_num = random.randint(0, bits.uint)
-        print 'random_num:' + random_num.__str__()
+        # print 'random_num:' + random_num.__str__()
         bin_str = bin(random_num)
     # print 'created bit:' + bin_str[2:]
 
@@ -108,25 +108,16 @@ def fuzz(**kwargs):
         # 随机选取一种变异算子进行变异
         mutant_bit_array = operators.get(random.randint(0, operators.__len__() - 1))(bit_array)
         # 写入变异后的文件
-        with open('test' + time.time().__str__() + '.png', 'wb') as output:
-            print '生成' + output.name
-            mutant_bit_array.tofile(output)
-def test(**kwargs):
-    operators = {0: remove, 1: add, 2: replace, 3: replace_with_1, 4: replace_with_0}
-    if kwargs.get("seedfile", False):
-        # 读入文件的二进制
-        with open(kwargs["seedfile"], 'rb') as f:
-            bit_array = BitArray(f)
-        # 随机选取一种变异算子进行变异
-        mutant_bit_array = operators.get(random.randint(0, operators.__len__() - 1))(bit_array)
-        # 写入变异后的文件
-        with open('test' + time.time().__str__() + '.png', 'wb') as output:
+        with open('/home/wcx/Development/Research/DFFA/res/mutants/job1/test' + time.time().__str__() + '.png',
+                  'wb') as output:
             print '生成' + output.name
             mutant_bit_array.tofile(output)
 
+
 if __name__ == '__main__':
-    fuzz(seedfile='Lenna.png')
-    # bit_array = BitArray('0b11')
-    # bit_array.overwrite('0b1',pos=1)
-    # remove(bit_array)
-    # add(bit_array)
+    for i in range(0, 100):
+        fuzz(seedfile='../res/seeds/Lenna.png')
+        # bit_array = BitArray('0b11')
+        # bit_array.overwrite('0b1',pos=1)
+        # remove(bit_array)
+        # add(bit_array)
