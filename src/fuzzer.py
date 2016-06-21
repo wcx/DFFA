@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*
 import random
-
 import time
 from bitstring import BitArray
 import os
+import copy
 
 
 def get_bits(length, mode=-1):
@@ -115,13 +115,17 @@ def fuzz(**kwargs):
                 os.makedirs(output_path)
             for j in range(1, job_case_num):
                 # 随机选取一种变异算子进行变异
-                print '变异前:'+bit_array.len.__str__()
-                mutant_bit_array = operators.get(random.randint(0, operators.__len__() - 1))(bit_array)
+                tmp=copy.deepcopy(bit_array)
+                print '**************************************************************************'
+                print '第'+j.__str__()+'次'
+                print '变异前:'+tmp.len.__str__()
+                mutant_bit_array = operators.get(random.randint(0, operators.__len__() - 1))(tmp)
                 print '变异后:'+mutant_bit_array.len.__str__()
                 # 写入变异后的文件
                 with open(output_path + '/test' + time.time().__str__() + '.' + format, 'wb') as output:
                     print '生成' + output.name
                     mutant_bit_array.tofile(output)
+                print '**************************************************************************'
 
 
 if __name__ == '__main__':
