@@ -4,6 +4,7 @@ import random
 
 import time
 from bitstring import BitArray
+import os
 
 
 def get_bits(length, mode=-1):
@@ -36,7 +37,7 @@ def get_bits(length, mode=-1):
 
 def remove(bit_array):
     print '---------------remove----------------'
-    print bit_array.len
+    # print bit_array.len
     start = random.randint(0, bit_array.len)
     print 'start:' + start.__str__()
     end = random.randint(0, bit_array.len)
@@ -101,23 +102,35 @@ def replace_with_0(bit_array):
 def fuzz(**kwargs):
     # 变异算子
     operators = {0: remove, 1: add, 2: replace, 3: replace_with_1, 4: replace_with_0}
-    if kwargs.get("seedfile", False):
+    if kwargs.get('seedfile', False):
         # 读入文件的二进制
-        with open(kwargs["seedfile"], 'rb') as f:
+        with open(kwargs['seedfile'], 'rb') as f:
             bit_array = BitArray(f)
-        # 随机选取一种变异算子进行变异
-        mutant_bit_array = operators.get(random.randint(0, operators.__len__() - 1))(bit_array)
-        # 写入变异后的文件
-        with open('/home/wcx/Development/Research/DFFA/res/mutants/job1/test' + time.time().__str__() + '.png',
-                  'wb') as output:
-            print '生成' + output.name
-            mutant_bit_array.tofile(output)
+        format = 'png'
+        job_num = kwargs.get('job_num', 0) + 1
+        job_case_num = kwargs.get('job_case_num', 0) + 1
+        for i in range(1, job_num):
+            output_path = '../res/mutants/' + format + '/' + i.__str__()
+            if not os.path.exists(output_path):
+                os.makedirs(output_path)
+            for j in range(1, job_case_num):
+                # 随机选取一种变异算子进行变异
+                print '变异前:'+bit_array.len.__str__()
+                mutant_bit_array = operators.get(random.randint(0, operators.__len__() - 1))(bit_array)
+                print '变异后:'+mutant_bit_array.len.__str__()
+                # 写入变异后的文件
+                with open(output_path + '/test' + time.time().__str__() + '.' + format, 'wb') as output:
+                    print '生成' + output.name
+                    mutant_bit_array.tofile(output)
 
 
 if __name__ == '__main__':
-    for i in range(0, 100):
-        fuzz(seedfile='../res/seeds/Lenna.png')
-        # bit_array = BitArray('0b11')
-        # bit_array.overwrite('0b1',pos=1)
-        # remove(bit_array)
-        # add(bit_array)
+    # for i in range(0, 10):
+    begintime = time.time()
+    fuzz(seedfile='../res/seeds/Lenna.png', job_num=100, job_case_num=5000)
+    print begintime
+    print time.time()
+    # bit_array = BitArray('0b11')
+    # bit_array.overwrite('0b1',pos=1)
+    # remove(bit_array)
+    # add(bit_array)

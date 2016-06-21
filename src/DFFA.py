@@ -15,20 +15,20 @@ from transwarp.db import MySQLHelper
 from utils.utils import *
 
 RES_PATH = '../res'
+FILES_PATH = RES_PATH + '/mutants'
 
 
 def push_files():
-    pass
-    # '''
-    # 向android devices push files
-    # '''
-    # local_path = 'files/pdfs'
-    # remote_path = '/mnt/sdcard/FuzzDownload'
-    # cmd = ['adb', 'push', local_path, remote_path]
-    # popen_wait(cmd)
-    # files = os.listdir(local_path)
-    # remote_files = [remote_path + '/' + file for file in files]
-    # return remote_files
+    '''
+    向android devices push files
+    '''
+    local_path = 'files/pdfs'
+    remote_path = '/mnt/sdcard/FuzzDownload'
+    cmd = ['adb', 'push', local_path, remote_path]
+    popen_wait(cmd)
+    files = os.listdir(local_path)
+    remote_files = [remote_path + '/' + file for file in files]
+    return remote_files
 
 
 def open_file(files):
@@ -102,6 +102,10 @@ def push_mutant_files():
 
 def run_campaign(cases):
     for i, case in enumerate(cases):
+        local_path = FILES_PATH + '/job1' + cases.mutant_file
+        remote_path = '/mnt/sdcard/FuzzDownload'
+        push_cmd = ['adb', 'push', local_path, remote_path]
+
         print_symbol(i.__str__())
         open_cmd = ['adb', 'shell', 'am', 'start', '-W', '-S']
         open_cmd.extend(['-a', case.target.action])
@@ -109,17 +113,17 @@ def run_campaign(cases):
         open_cmd.extend(['-t', case.target.mime_type])
         open_cmd.extend(['-d', case.mutant_file])
         open_cmd.append(case.target.package + "/" + case.target.activity)
-        #清空日志
+        # 清空日志
         log_clean_cmd = ['adb', 'logcat', '-c']
         print'执行:' + to_cmd_str(log_clean_cmd)
         popen_wait(log_clean_cmd)
-        #执行用例
+        # 执行用例
         print'执行:' + to_cmd_str(open_cmd)
         try:
             timeout_cmd(open_cmd, timeout=3)
         except TimeoutError as e:
             print e
-        #记录日志
+        # 记录日志
         log_cmd = ['adb', 'logcat', '-d', '-v', 'time', '*:E', '>',
                    '../res/logs/' + 'log' + time.time().__str__() + '.txt']
         print'执行:' + to_cmd_str(log_cmd)
@@ -132,25 +136,24 @@ if __name__ == '__main__':
     # target = sqlhelper.query_target()
     # sqlhelper.close()
 
+    # target = TestTarget('com.alensw.PicFolder', 'com.alensw.transfer.TransferActivity',
+    #                     'android.intent.action.SEND_MULTIPLE', 'android.intent.category.DEFAULT', 'image/*', 'foo',
+    #                     'pic',
+    #                     '11',
+    #                     '22',
+    #                     'test/')
+    mutant_file = 'file:///mnt/sdcard/Download/nexusx_1920x1080.png'
     target = TestTarget('com.alensw.PicFolder', 'com.alensw.transfer.TransferActivity',
-                        'android.intent.action.SEND_MULTIPLE', 'android.intent.category.DEFAULT', 'image/*', 'foo',
-                        'pic',
+                        'android.intent.action.SEND', 'android.intent.category.DEFAULT', 'image/*', 'foo', 'pic',
                         '11',
                         '22',
                         'test/')
-    mutant_file = "file:///mnt/sdcard/Download/nexusx_1920x1080.png"
-    target1 = TestTarget('com.alensw.PicFolder', 'com.alensw.transfer.TransferActivity',
-                         'android.intent.action.SEND', 'android.intent.category.DEFAULT', 'image/*', 'foo', 'pic',
-                         '11',
-                         '22',
-                         'test/')
+    files = os.listdir(FILES_PATH + '/png/1')
+    print files
+    print files.__len__()
     push_mutant_files()
-
     cases = list()
-    cases.append(TestCase(target, mutant_file))
-    cases.append(TestCase(target1, mutant_file))
-    # cases.append(TestCase(target, mutant_file))
-    # cases.append(TestCase(target1, mutant_file))
-    # cases.append(TestCase(target, mutant_file))
-
-    run_campaign(cases)
+    for file in files:
+        cases.append(TestCase(target, 'file://mnt/sdcard/Download/' + file))
+    print cases.__len__()
+    # run_campaign(cases)
