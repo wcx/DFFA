@@ -5,6 +5,7 @@ import time
 from bitstring import BitArray
 import os
 import copy
+from utils import utils
 
 
 def get_bits(length, mode=-1):
@@ -55,7 +56,7 @@ def remove(bit_array):
     del bit_array[start:end]
     # print 'del:' + bit_array.bin
     print '---------------remove----------------'
-    return bit_array
+    return bit_array, start, end
 
 
 def add(bit_array):
@@ -71,7 +72,7 @@ def add(bit_array):
     bit_array.insert(get_bits(length), pos=pos)
     # print 'added bit_array:' + bit_array.bin
     print '-----------add-------------'
-    return bit_array
+    return bit_array, pos, pos + length
 
 
 def replace(bit_array, mode=-1):
@@ -86,7 +87,7 @@ def replace(bit_array, mode=-1):
     bit_array.overwrite(get_bits(length, mode), pos=pos)
     # print 'changed bit_array:' + bit_array.bin
     print '-----------change-------------'
-    return bit_array
+    return bit_array, pos, pos + length
 
 
 def replace_with_1(bit_array):
@@ -109,29 +110,41 @@ def fuzz(**kwargs):
         format = 'png'
         job_num = kwargs.get('job_num', 0) + 1
         job_case_num = kwargs.get('job_case_num', 0) + 1
+        custom_path = kwargs.get('custom_path', '../res/mutants')
         for i in range(1, job_num):
-            output_path = '../res/mutants/' + format + '/' + i.__str__()
+            output_path = custom_path + '/' + format + '/' + i.__str__()
             if not os.path.exists(output_path):
                 os.makedirs(output_path)
+
+            with open(custom_path + '/' + format + '/log.txt', 'a') as log:
+                log.write("***************job" + i.__str__() + "***************")
+                log.write('\n')
+
             for j in range(1, job_case_num):
                 # 随机选取一种变异算子进行变异
-                tmp=copy.deepcopy(bit_array)
+                tmp = copy.deepcopy(bit_array)
                 print '**************************************************************************'
-                print '第'+j.__str__()+'次'
-                print '变异前:'+tmp.len.__str__()
-                mutant_bit_array = operators.get(random.randint(0, operators.__len__() - 1))(tmp)
-                print '变异后:'+mutant_bit_array.len.__str__()
+                print 'job' + i.__str__() + '---第' + j.__str__() + '次'
+                print '变异前:' + tmp.len.__str__()
+                mutant_bit_array, start, end = operators.get(random.randint(0, operators.__len__() - 1))(tmp)
+                print '变异后:' + mutant_bit_array.len.__str__()
                 # 写入变异后的文件
-                with open(output_path + '/test' + time.time().__str__() + '.' + format, 'wb') as output:
+                output_file = 'test' + i.__str__() + '-' + j.__str__() + '.' + format
+                with open(output_path + '/' + output_file, 'wb') as output:
                     print '生成' + output.name
                     mutant_bit_array.tofile(output)
+                with open(custom_path + '/' + format + '/log.txt', 'a') as log:
+                    log.write(output_file + '|' + start.__str__() + '|' + end.__str__() + '|')
+                    log.write('\n')
                 print '**************************************************************************'
 
 
 if __name__ == '__main__':
     # for i in range(0, 10):
     begintime = time.time()
-    fuzz(seedfile='../res/seeds/Lenna.png', job_num=100, job_case_num=5000)
+
+    fuzz(seedfile='../res/seeds/Lenna.png', job_num=50, job_case_num=3000,
+         custom_path='/media/wcx/Ubuntu 14.0/ResearchData')
     print begintime
     print time.time()
     # bit_array = BitArray('0b11')
