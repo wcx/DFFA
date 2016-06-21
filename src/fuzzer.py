@@ -116,7 +116,7 @@ def fuzz(**kwargs):
             if not os.path.exists(output_path):
                 os.makedirs(output_path)
 
-            with open(custom_path + '/' + format + '/log.txt', 'a') as log:
+            with open(output_path + '/log.txt', 'a') as log:
                 log.write("***************job" + i.__str__() + "***************")
                 log.write('\n')
 
@@ -133,7 +133,7 @@ def fuzz(**kwargs):
                 with open(output_path + '/' + output_file, 'wb') as output:
                     print '生成' + output.name
                     mutant_bit_array.tofile(output)
-                with open(custom_path + '/' + format + '/log.txt', 'a') as log:
+                with open(output_path + '/log.txt', 'a') as log:
                     log.write(output_file + '|' + start.__str__() + '|' + end.__str__() + '|')
                     log.write('\n')
                 print '**************************************************************************'
@@ -143,7 +143,7 @@ if __name__ == '__main__':
     # for i in range(0, 10):
     begintime = time.time()
 
-    fuzz(seedfile='../res/seeds/Lenna.png', job_num=50, job_case_num=3000,
+    fuzz(seedfile='../res/seeds/Lenna.png', job_num=50, job_case_num=5000,
          custom_path='/media/wcx/Ubuntu 14.0/ResearchData')
     print begintime
     print time.time()
