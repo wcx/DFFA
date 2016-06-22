@@ -5,7 +5,7 @@ import time
 from bitstring import BitArray
 import os
 import copy
-from utils import utils
+import conf
 
 
 def get_bits(length, mode=-1):
@@ -107,16 +107,21 @@ def fuzz(**kwargs):
         # 读入文件的二进制
         with open(kwargs['seedfile'], 'rb') as f:
             bit_array = BitArray(f)
+
         format = 'png'
         job_num = kwargs.get('job_num', 0) + 1
         job_case_num = kwargs.get('job_case_num', 0) + 1
         custom_path = kwargs.get('custom_path', '../res/mutants')
+
         for i in range(1, job_num):
             output_path = custom_path + '/' + format + '/' + i.__str__()
+            log_path = custom_path + '/' + format + '/' + 'logs/'
             if not os.path.exists(output_path):
                 os.makedirs(output_path)
-
-            with open(output_path + '/log.txt', 'a') as log:
+            if not os.path.exists(log_path):
+                os.makedirs(log_path)
+            log_file = log_path + 'log-' + i.__str__()+'.txt'
+            with open(log_file, 'a') as log:
                 log.write("***************job" + i.__str__() + "***************")
                 log.write('\n')
 
@@ -133,21 +138,15 @@ def fuzz(**kwargs):
                 with open(output_path + '/' + output_file, 'wb') as output:
                     print '生成' + output.name
                     mutant_bit_array.tofile(output)
-                with open(output_path + '/log.txt', 'a') as log:
+                with open(log_file, 'a') as log:
                     log.write(output_file + '|' + start.__str__() + '|' + end.__str__() + '|')
                     log.write('\n')
                 print '**************************************************************************'
 
 
 if __name__ == '__main__':
-    # for i in range(0, 10):
     begintime = time.time()
 
-    fuzz(seedfile='../res/seeds/Lenna.png', job_num=50, job_case_num=5000,
-         custom_path='/media/wcx/Ubuntu 14.0/ResearchData')
+    fuzz(seedfile='../res/seeds/Lenna.png', job_num=10, job_case_num=5, custom_path=conf.MUTANTS_PATH)
     print begintime
     print time.time()
-    # bit_array = BitArray('0b11')
-    # bit_array.overwrite('0b1',pos=1)
-    # remove(bit_array)
-    # add(bit_array)

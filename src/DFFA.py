@@ -10,12 +10,10 @@
 """
 import os
 
+from src import conf
 from src.pretreatment.models import TestTarget
 from transwarp.db import MySQLHelper
 from utils.utils import *
-
-RES_PATH = '../res'
-FILES_PATH = RES_PATH + '/mutants'
 
 
 def push_files():
@@ -96,7 +94,7 @@ class TestCase(object):
         self._target = value
 
 
-def push_mutant_files():
+def push_mutant_file(local_path):
     pass
 
 
@@ -148,12 +146,19 @@ if __name__ == '__main__':
                         '11',
                         '22',
                         'test/')
-    files = os.listdir(FILES_PATH + '/png/1')
-    print files
-    print files.__len__()
+    format = 'png'
+    job_path = conf.MUTANTS_PATH + '/' + format + '/'
+    job_num = os.listdir(job_path).__len__()
+    for i in range(1, 2):
+        cases = os.listdir(job_path+i.__str__())
+        for case in cases:
+            push_file()
+            print case
+
+
     push_mutant_files()
     cases = list()
-    for file in files:
-        cases.append(TestCase(target, 'file://mnt/sdcard/Download/' + file))
-    print cases.__len__()
+    # for file in files:
+    #     cases.append(TestCase(target, 'file://mnt/sdcard/Download/' + file))
+    # print cases.__len__()
     # run_campaign(cases)
