@@ -179,7 +179,7 @@ def home_screen():
     '''
     向Android Device发送HOME键动作事件
     '''
-    return send_key_event('3')
+    return send_key_event('2')
 
 
 def send_key_event(event_num):

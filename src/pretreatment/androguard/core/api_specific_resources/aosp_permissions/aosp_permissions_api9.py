@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #################################################
-### Extracted from platform version: 2.3.2
+### Extracted from platform version: 2.2.2
 #################################################
 AOSP_PERMISSIONS = {
     'android.permission.BIND_WALLPAPER': {

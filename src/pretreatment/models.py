@@ -3,11 +3,14 @@
 
 
 class TestTarget(object):
-    def __init__(self, package, activity, mime_type, file_name, app_name, version_code, version_name, seed):
+    def __init__(self, package, activity, action, category, mime_type, file_name, app_name, version_code, version_name,
+                 seed):
         self.package = package
         self.activity = activity
-        self.file_name = file_name
+        self.action = action
+        self.category = category
         self.mime_type = mime_type
+        self.file_name = file_name
         self.app_name = app_name
         self.version_code = version_code
         self.version_name = version_name
@@ -44,6 +47,14 @@ class TestTarget(object):
         # @property
         # def seeds(self):
         #     return self.seeds
+
+
+class IntentFilter(object):
+    def __init__(self, actions=[], categorys=[], mime_types=[]):
+        self.actions = actions
+        self.categorys = categorys
+        self.mime_types = mime_types
+        pass
 
 
 if __name__ == '__main__':

@@ -4,11 +4,6 @@ import subprocess
 import time
 
 
-def popen_wait(cmd):
-    r = subprocess.Popen(cmd)
-    r.wait()
-
-
 def home_screen():
     '''
     向Android Device发送HOME键动作事件
@@ -37,12 +32,17 @@ class TimeoutError(Exception):
     pass
 
 
+def popen_wait(cmd):
+    p1 = subprocess.Popen(to_cmd_str(cmd), shell=True)
+    p1.wait()
+
 def timeout_cmd(cmd, timeout=60):
     """执行命令cmd，返回命令输出的内容。
     如果超时将会抛出TimeoutError异常。
     cmd - 要执行的命令
     timeout - 最长等待时间，单位：秒
     """
+    cmd=to_cmd_str(cmd)
     p = subprocess.Popen(cmd, stderr=subprocess.STDOUT, stdout=subprocess.PIPE, shell=True)
     t_beginning = time.time()
     seconds_passed = 0

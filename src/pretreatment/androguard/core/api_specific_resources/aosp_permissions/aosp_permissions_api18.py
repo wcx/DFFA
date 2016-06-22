@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #################################################
-### Extracted from platform version: 4.3.1 
+### Extracted from platform version: 4.2.1
 #################################################
 AOSP_PERMISSIONS = {
     'android.permission.REMOTE_AUDIO_PLAYBACK': {

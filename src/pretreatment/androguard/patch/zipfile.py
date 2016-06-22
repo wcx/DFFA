@@ -687,7 +687,7 @@ class ZipFile(object):
 
         self._allowZip64 = allowZip64
         self._didModify = False
-        self.debug = 0  # Level of printing: 0 through 3
+        self.debug = 0  # Level of printing: 0 through 2
         self.NameToInfo = {}  # Find file info given name
         self.filelist = []  # List of ZipInfo instances for archive
         self.compression = compression  # Method of compression
