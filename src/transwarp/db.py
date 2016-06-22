@@ -4,7 +4,7 @@ import warnings
 
 import MySQLdb
 
-from src.pretreatment.models import TestTarget
+from src.models import TestTarget
 
 warnings.filterwarnings("ignore")
 
