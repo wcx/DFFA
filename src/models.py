@@ -57,6 +57,28 @@ class IntentFilter(object):
         pass
 
 
+class TestCase(object):
+    def __init__(self, target, mutant_file):
+        self._target = target
+        self._mutant_file = mutant_file
+
+    @property
+    def target(self):
+        return self._target
+
+    @property
+    def mutant_file(self):
+        return self._mutant_file
+
+    @mutant_file.setter
+    def mutant_file(self, value):
+        self._mutant_file = value
+
+    @target.setter
+    def target(self, value):
+        self._target = value
+
+
 if __name__ == '__main__':
     target = TestTarget("com.test", "com.test.act", "*/*", "/sd/a/a.jpg", "piuk", "123", "1.01", "~/")
     print target.mime_type

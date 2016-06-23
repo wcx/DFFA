@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*
+import copy
+import os
 import random
 import time
+
 from bitstring import BitArray
-import os
-import copy
-import conf
 
 
 def get_bits(length, mode=-1):
@@ -147,6 +147,6 @@ def fuzz(**kwargs):
 if __name__ == '__main__':
     begintime = time.time()
 
-    fuzz(seedfile='../res/seeds/Lenna.png', job_num=10, job_case_num=5, custom_path=conf.MUTANTS_PATH)
+    fuzz(seedfile='../res/seeds/Lenna.png', job_num=10, job_case_num=5)
     print begintime
     print time.time()

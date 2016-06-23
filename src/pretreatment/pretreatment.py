@@ -9,7 +9,7 @@ sys.setdefaultencoding('utf8')
 import os
 from src.transwarp.db import MySQLHelper
 from androguard.core.bytecodes import apk
-from models import TestTarget, IntentFilter
+from src.models import TestTarget, IntentFilter
 
 BASE_APK_PATH = "../../res/apks"
 BASE_SEED_PATH = "../../res/seeds"
