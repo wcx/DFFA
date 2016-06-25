@@ -8,6 +8,8 @@ nohup.out
 /res/seeds/*.gif
 /res/seeds/*.jpg
 /res/mutants/
+*.swp
+wcx.py
 
 # Created by https://www.gitignore.io/api/linux,pycharm,python
 

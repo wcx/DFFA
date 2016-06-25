@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*
 import subprocess
 import time
+from datetime import timedelta
 
 
 def home_screen():
@@ -36,13 +37,14 @@ def popen_wait(cmd):
     p1 = subprocess.Popen(to_cmd_str(cmd), shell=True)
     p1.wait()
 
+
 def timeout_cmd(cmd, timeout=60):
     """执行命令cmd，返回命令输出的内容。
     如果超时将会抛出TimeoutError异常。
     cmd - 要执行的命令
     timeout - 最长等待时间，单位：秒
     """
-    cmd=to_cmd_str(cmd)
+    cmd = to_cmd_str(cmd)
     p = subprocess.Popen(cmd, stderr=subprocess.STDOUT, stdout=subprocess.PIPE, shell=True)
     t_beginning = time.time()
     seconds_passed = 0
@@ -60,6 +62,25 @@ def timeout_cmd(cmd, timeout=60):
 class logger(object):
     def info(self, info):
         print info
+
+
+def log_runtime(function):
+    def wrapper(*args, **kwargs):
+        start = time.time()
+        start_localtime = time.localtime()
+        print '[%s()] is starting.' % function.__name__
+
+        rst = function(*args, **kwargs)
+
+        end = time.time()
+        print time.strftime("%Y-%m-%d %H:%M:%S", start_localtime)
+        print '[%s()] is end.' % function.__name__
+        run_time = end - start
+        print str(timedelta(seconds=run_time))
+        print time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        return rst
+
+    return wrapper
 
 
 if __name__ == "__main__":

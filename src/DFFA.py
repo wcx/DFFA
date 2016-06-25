@@ -62,7 +62,7 @@ def flush_log(case):
 
 def run_job(cases, mutant_files_path, job_id):
     for i, case in enumerate(cases):
-        print_symbol(i.__str__())
+        print_symbol(str(i))
         # push变异文件
         push_file(mutant_files_path, case.mutant_file)
         # 清空日志
@@ -77,17 +77,20 @@ def run_job(cases, mutant_files_path, job_id):
 
 
 def run_jobs(target):
-    format = 'png'
+    format = target.mime_type.split('/')[1]
     job_path = conf.MUTANTS_PATH + '/' + format + '/'
-    job_num = os.listdir(job_path).__len__()
-    for i in range(1, job_num):
-        mutant_files_path = job_path + i.__str__()
-        mutant_files = os.listdir(mutant_files_path)
+    if os.path.exists(job_path):
+        job_num = os.listdir(job_path).__len__()
+        for i in range(1, job_num):
+            mutant_files_path = job_path + str(i)
+            mutant_files = os.listdir(mutant_files_path)
 
-        cases = list()
-        for file in mutant_files:
-            cases.append(TestCase(target, file))
-        run_job(cases, mutant_files_path, i)
+            cases = list()
+            for file in mutant_files:
+                cases.append(TestCase(target, file))
+            run_job(cases, mutant_files_path, i)
+    else:
+        print '没有对应变异文件,程序退出:\n' + format + ' files didn\'t exist'
 
 
 if __name__ == '__main__':
@@ -107,7 +110,7 @@ if __name__ == '__main__':
     #                      '22',
     #                      'test/')
     target = TestTarget('com.tencent.mm', 'com.tencent.mm.ui.tools.ShareScreenImgUI',
-                        'android.intent.action.VIEW', 'android.intent.category.DEFAULT', 'image/*', 'foo', 'pic',
+                        'android.intent.action.VIEW', 'android.intent.category.DEFAULT', 'image/png', 'foo', 'pic',
                         '11',
                         '22',
                         'test/')

@@ -3,9 +3,10 @@
 import copy
 import os
 import random
-import time
 
 from bitstring import BitArray
+
+from src.utils.utils import log_runtime
 
 
 def get_bits(length, mode=-1):
@@ -40,14 +41,14 @@ def remove(bit_array):
     print '---------------remove----------------'
     # print bit_array.len
     start = random.randint(0, bit_array.len)
-    print 'start:' + start.__str__()
+    print 'start:' + str(start)
     end = random.randint(0, bit_array.len)
-    print 'end:' + end.__str__()
+    print 'end:' + str(end)
     if start > end:
         tmp = start
         start = end
         end = tmp
-        print 'start:' + start.__str__() + '   end:' + end.__str__()
+        print 'start:' + str(start) + '   end:' + str(end)
     elif start == end:
         print 'start==end'
         remove(bit_array)
@@ -66,8 +67,8 @@ def add(bit_array):
     pos = random.randint(0, bit_array.len)
     # 随机长度的位串
     length = random.randint(1, bit_array.len)
-    print 'random pos:' + pos.__str__()
-    print 'random len:' + length.__str__()
+    print 'random pos:' + str(pos)
+    print 'random len:' + str(length)
     # 在随机的位置插入随机长度的随机位串
     bit_array.insert(get_bits(length), pos=pos)
     # print 'added bit_array:' + bit_array.bin
@@ -82,8 +83,8 @@ def replace(bit_array, mode=-1):
     pos = random.randint(0, bit_array.len - 1)
     # 随机长度的位串
     length = random.randint(1, bit_array.len - pos)
-    print 'random pos:' + pos.__str__()
-    print 'random len:' + length.__str__()
+    print 'random pos:' + str(pos)
+    print 'random len:' + str(length)
     bit_array.overwrite(get_bits(length, mode), pos=pos)
     # print 'changed bit_array:' + bit_array.bin
     print '-----------change-------------'
@@ -100,6 +101,7 @@ def replace_with_0(bit_array):
     return replace(bit_array, mode=0)
 
 
+@log_runtime
 def fuzz(**kwargs):
     # 变异算子
     operators = {0: remove, 1: add, 2: replace, 3: replace_with_1, 4: replace_with_0}
@@ -114,39 +116,35 @@ def fuzz(**kwargs):
         custom_path = kwargs.get('custom_path', '../res/mutants')
 
         for i in range(1, job_num):
-            output_path = custom_path + '/' + format + '/' + i.__str__()
+            output_path = custom_path + '/' + format + '/' + str(i)
             log_path = custom_path + '/' + format + '/' + 'logs/'
             if not os.path.exists(output_path):
                 os.makedirs(output_path)
             if not os.path.exists(log_path):
                 os.makedirs(log_path)
-            log_file = log_path + 'log-' + i.__str__()+'.txt'
+            log_file = log_path + 'log-' + str(i) + '.txt'
             with open(log_file, 'a') as log:
-                log.write("***************job" + i.__str__() + "***************")
+                log.write("***************job" + str(i) + "***************")
                 log.write('\n')
 
             for j in range(1, job_case_num):
                 # 随机选取一种变异算子进行变异
                 tmp = copy.deepcopy(bit_array)
                 print '**************************************************************************'
-                print 'job' + i.__str__() + '---第' + j.__str__() + '次'
-                print '变异前:' + tmp.len.__str__()
+                print 'job' + str(i) + '---第' + str(j) + '次'
+                print '变异前:' + str(tmp.len)
                 mutant_bit_array, start, end = operators.get(random.randint(0, operators.__len__() - 1))(tmp)
-                print '变异后:' + mutant_bit_array.len.__str__()
+                print '变异后:' + str(mutant_bit_array.len)
                 # 写入变异后的文件
-                output_file = 'test' + i.__str__() + '-' + j.__str__() + '.' + format
+                output_file = 'test' + str(i) + '-' + str(j) + '.' + format
                 with open(output_path + '/' + output_file, 'wb') as output:
                     print '生成' + output.name
                     mutant_bit_array.tofile(output)
                 with open(log_file, 'a') as log:
-                    log.write(output_file + '|' + start.__str__() + '|' + end.__str__() + '|')
+                    log.write(output_file + '|' + str(start) + '|' + str(end) + '|')
                     log.write('\n')
                 print '**************************************************************************'
 
 
 if __name__ == '__main__':
-    begintime = time.time()
-
-    fuzz(seedfile='../res/seeds/Lenna.png', job_num=10, job_case_num=5)
-    print begintime
-    print time.time()
+    fuzz(seedfile='../res/seeds/Lenna.png', job_num=10, job_case_num=3)
