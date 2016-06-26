@@ -6,6 +6,7 @@ import random
 
 from bitstring import BitArray
 
+from src.utils import conf
 from src.utils.utils import log_runtime
 
 
@@ -102,7 +103,7 @@ def replace_with_0(bit_array):
 
 
 @log_runtime
-def fuzz(**kwargs):
+def fuzz_file(**kwargs):
     # 变异算子
     operators = {0: remove, 1: add, 2: replace, 3: replace_with_1, 4: replace_with_0}
     if kwargs.get('seedfile', False):
@@ -113,7 +114,7 @@ def fuzz(**kwargs):
         format = 'png'
         job_num = kwargs.get('job_num', 0) + 1
         job_case_num = kwargs.get('job_case_num', 0) + 1
-        custom_path = kwargs.get('custom_path', '../res/mutants')
+        custom_path = kwargs.get('custom_path', conf.MUTANTS_PATH)
 
         for i in range(1, job_num):
             output_path = custom_path + '/' + format + '/' + str(i)
@@ -147,4 +148,4 @@ def fuzz(**kwargs):
 
 
 if __name__ == '__main__':
-    fuzz(seedfile='../res/seeds/Lenna.png', job_num=10, job_case_num=3)
+    fuzz_file(seedfile='../res/seeds/Lenna.png', job_num=10, job_case_num=3)
