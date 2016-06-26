@@ -26,6 +26,12 @@ def print_symbol(str):
 
 
 def to_cmd_str(cmd):
+    """
+    # 格式化命令
+    e.g ['adb','shell','list']->adb shell list
+    :param cmd:
+    :return:
+    """
     return ' '.join(str(i) for i in cmd)
 
 
@@ -34,15 +40,18 @@ class TimeoutError(Exception):
 
 
 def popen_wait(cmd):
-    p1 = subprocess.Popen(to_cmd_str(cmd), shell=True)
-    p1.wait()
+    p = subprocess.Popen(to_cmd_str(cmd), stderr=subprocess.STDOUT, stdout=subprocess.PIPE, shell=True)
+    p.wait()
+    return p
 
 
 def timeout_cmd(cmd, timeout=60):
-    """执行命令cmd，返回命令输出的内容。
+    """
+    执行命令cmd，返回命令输出的内容。
     如果超时将会抛出TimeoutError异常。
-    cmd - 要执行的命令
-    timeout - 最长等待时间，单位：秒
+    :param cmd: 要执行的命令
+    :param timeout: 最长等待时间，单位：秒
+    :return:
     """
     cmd = to_cmd_str(cmd)
     p = subprocess.Popen(cmd, stderr=subprocess.STDOUT, stdout=subprocess.PIPE, shell=True)
@@ -65,13 +74,19 @@ class logger(object):
 
 
 def log_runtime(function):
+    """
+    包装方法,显示方法运行时间
+    :param function:
+    :return:
+    """
+
     def wrapper(*args, **kwargs):
         start = time.time()
         start_localtime = time.localtime()
         print '[%s()] is starting.' % function.__name__
-
+        ####
         rst = function(*args, **kwargs)
-
+        ####
         end = time.time()
         print time.strftime("%Y-%m-%d %H:%M:%S", start_localtime)
         print '[%s()] is end.' % function.__name__

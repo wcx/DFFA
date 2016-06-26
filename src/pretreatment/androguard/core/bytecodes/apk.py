@@ -24,12 +24,11 @@ from xml.dom import minidom
 from xml.sax.saxutils import escape
 from zlib import crc32
 
-from androguard.core import bytecode
-from androguard.core.bytecodes.dvm_permissions import DVM_PERMISSIONS
-from androguard.core.resources import public
-from androguard.util import read
-
+from src.pretreatment.androguard.core import bytecode
 from src.pretreatment.androguard.core import androconf
+from src.pretreatment.androguard.core.bytecodes.dvm_permissions import DVM_PERMISSIONS
+from src.pretreatment.androguard.core.resources import public
+from src.pretreatment.androguard.util import read
 
 NS_ANDROID_URI = 'http://schemas.android.com/apk/res/android'
 

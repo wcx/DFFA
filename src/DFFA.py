@@ -10,7 +10,9 @@
 """
 import os
 
+from src.fuzzer import fuzz
 from src.models import TestTarget, TestCase
+from src.pretreatment.pretreatment import parse_apks
 from src.utils import conf
 from utils.utils import *
 
@@ -60,6 +62,17 @@ def flush_log(case):
     popen_wait(log_cmd)
 
 
+def is_install(target):
+    check_cmd = ['adb', 'shell', 'pm', 'list', 'package', '|', 'grep', '-c', target.package]
+    p = popen_wait(check_cmd)
+    return p.stdout.readline()
+
+
+def install_apk(target):
+    install_cmd = ['adb', 'install', target.file_name]
+    popen_wait(install_cmd)
+
+
 def run_job(cases, mutant_files_path, job_id):
     for i, case in enumerate(cases):
         print_symbol(str(i))
@@ -94,6 +107,19 @@ def run_jobs(target):
 
 
 if __name__ == '__main__':
+    #解析apk
+    parse_apks(conf.APK_PATH)
+    fuzz(seedfile='../res/seeds/Lenna.png', job_num=10, job_case_num=3)
+    target = TestTarget('com.tencent.mm', 'com.tencent.mm.ui.tools.ShareScreenImgUI',
+                        'android.intent.action.VIEW', 'android.intent.category.DEFAULT', 'image/png', 'foo', 'pic',
+                        '11',
+                        '22',
+                        'test/')
+    is_install(target)
+
+    if not is_install(target):
+        install_apk(target)
+    run_jobs(target)
     # sqlhelper = MySQLHelper()
     # target = sqlhelper.query_target()
     # sqlhelper.close()
@@ -109,9 +135,3 @@ if __name__ == '__main__':
     #                      '11',
     #                      '22',
     #                      'test/')
-    target = TestTarget('com.tencent.mm', 'com.tencent.mm.ui.tools.ShareScreenImgUI',
-                        'android.intent.action.VIEW', 'android.intent.category.DEFAULT', 'image/png', 'foo', 'pic',
-                        '11',
-                        '22',
-                        'test/')
-    run_jobs(target)
