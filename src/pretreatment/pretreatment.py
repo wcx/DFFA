@@ -100,7 +100,6 @@ def to_targets(apk_path):
                                    apkf.get_app_name(),
                                    apkf.get_androidversion_code(), apkf.get_androidversion_name(),
                                    seed))
-
     print "---结束---target convert---"
     return targets
 
