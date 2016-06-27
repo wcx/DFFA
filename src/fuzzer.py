@@ -7,7 +7,7 @@ import random
 from bitstring import BitArray
 
 from src.utils import conf
-from src.utils.utils import log_runtime
+from src.utils.utils import log_runtime, mkdirs
 
 
 def get_bits(length, mode=-1):
@@ -119,10 +119,8 @@ def fuzz_file(**kwargs):
         for i in range(1, job_num):
             output_path = custom_path + '/' + format + '/' + str(i)
             log_path = custom_path + '/' + format + '/' + 'logs/'
-            if not os.path.exists(output_path):
-                os.makedirs(output_path)
-            if not os.path.exists(log_path):
-                os.makedirs(log_path)
+            mkdirs(output_path)
+            mkdirs(log_path)
             log_file = log_path + 'log-' + str(i) + '.txt'
             with open(log_file, 'a') as log:
                 log.write("***************job" + str(i) + "***************")

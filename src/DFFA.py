@@ -19,8 +19,10 @@ from utils.utils import *
 
 class DFFA(object):
     adb_cmd = ['adb', '-s']
+    log_path = conf.LOG_PATH
 
     def get_uni_crash(self):
+
         pass
 
     def push_file(self, local_path, file):
@@ -28,9 +30,11 @@ class DFFA(object):
         popen_wait(push_cmd)
 
     def rm_file(self, remote_file):
-        '''
-        清除文件
-        '''
+        """
+        删除文件
+        :param remote_file: 文件名称
+        :return:
+        """
         rm_cmd = self.adb_cmd + (['shell', 'rm', conf.REMOTE_PATH + remote_file])
         popen_wait(rm_cmd)
 
@@ -42,10 +46,7 @@ class DFFA(object):
         open_cmd.extend(['-d', 'file://' + conf.REMOTE_PATH + case.mutant_file])
         open_cmd.append(case.target.package + "/" + case.target.activity)
         print'执行:' + to_cmd_str(open_cmd)
-        try:
-            timeout_cmd(open_cmd, timeout=3)
-        except TimeoutError as e:
-            print e
+        timeout_cmd(open_cmd, timeout=3)
 
     def clean_log(self):
         log_clean_cmd = self.adb_cmd + (['logcat', '-c'])
@@ -54,7 +55,7 @@ class DFFA(object):
 
     def flush_log(self, case):
         log_cmd = self.adb_cmd + (['logcat', '-d', '-v', 'time', '*:E', '>',
-                                   conf.LOG_PATH + '/' + 'log-' + case.mutant_file + '.txt'])
+                                   self.log_path + '/' + 'log-' + case.mutant_file + '.txt'])
 
         print'执行:' + to_cmd_str(log_cmd)
         popen_wait(log_cmd)
@@ -94,6 +95,7 @@ class DFFA(object):
                 mutant_files = os.listdir(mutant_files_path)
 
                 cases = list()
+
                 for file in mutant_files:
                     cases.append(TestCase(target, file))
                 self.run_job(cases, mutant_files_path, i)
@@ -115,7 +117,9 @@ class DFFA(object):
 
     def run_targets(self, device):
         # 指定设备
-        self.adb_cmd.extend([str(device.serialno)])
+        self.adb_cmd.extend([device.serialno])
+        self.log_path += '/' + device.serialno
+        mkdirs(self.log_path)
         # 选择测试目标
         targets = self.select_targets()
         for target in targets:
@@ -125,6 +129,12 @@ class DFFA(object):
             self.run_jobs(target)
 
     def getprop(self, device, key):
+        """
+        获取设备信息
+        :param device:
+        :param key: 需获取属性
+        :return: 从设备获取的属性
+        """
         tmp = ''
         if key == 'brand':
             tmp = 'ro.product.brand'
@@ -143,6 +153,10 @@ class DFFA(object):
         return result.strip()
 
     def list_devices(self):
+        """
+        列出可用设备
+        :return: Device对象列表
+        """
         devices = list()
         list_cmd = ['adb', 'devices']
         p = popen_wait(list_cmd)

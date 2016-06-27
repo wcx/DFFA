@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*
+import os
 import subprocess
 import time
 from datetime import timedelta
@@ -34,12 +35,13 @@ class TimeoutError(Exception):
 
 
 def popen_wait(cmd):
-    p = subprocess.Popen(to_cmd_str(cmd), stderr=subprocess.STDOUT, stdout=subprocess.PIPE, shell=True)
+    cmd = to_cmd_str(cmd)
+    p = subprocess.Popen(cmd, stderr=subprocess.STDOUT, stdout=subprocess.PIPE, shell=True)
     p.wait()
     return p
 
 
-def timeout_cmd(cmd, timeout=60):
+def timeout_cmd(cmd, timeout=5):
     """
     执行命令cmd，返回命令输出的内容。
     如果超时将会抛出TimeoutError异常。
@@ -47,19 +49,31 @@ def timeout_cmd(cmd, timeout=60):
     :param timeout: 最长等待时间，单位：秒
     :return:
     """
-    cmd = to_cmd_str(cmd)
-    p = subprocess.Popen(cmd, stderr=subprocess.STDOUT, stdout=subprocess.PIPE, shell=True)
-    t_beginning = time.time()
-    seconds_passed = 0
-    while True:
-        if p.poll() is not None:
-            break
-        seconds_passed = time.time() - t_beginning
-        if timeout and seconds_passed > timeout:
-            p.terminate()
-            raise TimeoutError(cmd, timeout)
-        time.sleep(0.1)
-    return p
+    cmd = ['timeout', str(timeout)] + cmd
+    popen_wait(cmd)
+
+
+# def timeout_cmd(cmd, timeout=60):
+#     """
+#     执行命令cmd，返回命令输出的内容。
+#     如果超时将会抛出TimeoutError异常。
+#     :param cmd: 要执行的命令
+#     :param timeout: 最长等待时间，单位：秒
+#     :return:
+#     """
+#     cmd = to_cmd_str(cmd)
+#     p = subprocess.Popen(cmd, stderr=subprocess.STDOUT, stdout=subprocess.PIPE, shell=True)
+#     t_beginning = time.time()
+#     seconds_passed = 0
+#     while True:
+#         if p.poll() is not None:
+#             break
+#         seconds_passed = time.time() - t_beginning
+#         if timeout and seconds_passed > timeout:
+#             p.terminate()
+#             raise TimeoutError(cmd, timeout)
+#         time.sleep(0.1)
+#     return p
 
 
 def log_runtime(function):
@@ -85,6 +99,11 @@ def log_runtime(function):
         return rst
 
     return wrapper
+
+
+def mkdirs(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
 
 
 if __name__ == "__main__":

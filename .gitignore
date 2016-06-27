@@ -2,12 +2,7 @@
 nohup.out
 *.bak
 *.pyc
-/res/apks/*.apk
-/res/logs/*.txt
-/res/seeds/*.png
-/res/seeds/*.gif
-/res/seeds/*.jpg
-/res/mutants/
+/res/
 *.swp
 wcx.py
 
