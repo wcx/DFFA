@@ -11,15 +11,10 @@
 import os
 
 from src.fuzzer import fuzz_file
-from src.models import TestTarget, TestCase
+from src.models import TestTarget, TestCase, Device
 from src.pretreatment.pretreatment import parse_apks
 from src.utils import conf
 from utils.utils import *
-
-
-def list_devices():
-    devices = list()
-    return devices
 
 
 class DFFA(object):
@@ -119,7 +114,8 @@ class DFFA(object):
         return targets
 
     def run_targets(self, device):
-        self.adb_cmd.extend([str(device)])
+        # 指定设备
+        self.adb_cmd.extend([str(device.serialno)])
         # 选择测试目标
         targets = self.select_targets()
         for target in targets:
@@ -128,11 +124,51 @@ class DFFA(object):
             # 开始运行测试用例
             self.run_jobs(target)
 
+    def getprop(self, device, key):
+        tmp = ''
+        if key == 'brand':
+            tmp = 'ro.product.brand'
+        elif key == 'model':
+            tmp = 'ro.product.model'
+        elif key == 'build_id':
+            tmp = 'ro.build.id'
+        elif key == 'version_release':
+            tmp = 'ro.build.version.release'
+        else:
+            return tmp
+
+        get_prop_cmd = ['adb', '-s', str(device.serialno), 'shell', 'getprop', tmp]
+        p = popen_wait(get_prop_cmd)
+        result = p.stdout.readline()
+        return result.strip()
+
+    def list_devices(self):
+        devices = list()
+        list_cmd = ['adb', 'devices']
+        p = popen_wait(list_cmd)
+        for line in p.stdout.readlines():
+            content = line.split('\t')
+            if content.__len__() > 1:
+                if content[1] == 'device\n':
+                    device = Device()
+                    device.serialno = content[0]
+                    device.brand = self.getprop(device, 'brand')
+                    device.model = self.getprop(device, 'model')
+                    device.build_id = self.getprop(device, 'build_id')
+                    device.version_release = self.getprop(device, 'version_release')
+                    devices.append(device)
+        print '当前可用设备' + str(devices.__len__()) + '台'
+        for d in devices:
+            print d.serialno + '\t' + d.brand + '\t' + d.model + '\t' + d.build_id + '\t' + d.version_release
+        return devices
+
     def run_devices(self):
-        devices = list_devices()
-        devices.append('8XV5T15A20015305')
-        for device in devices:
-            self.run_targets(device)
+        devices = self.list_devices()
+        if devices.__len__() == 0:
+            print '未连接Android设备,程序退出'
+        else:
+            for device in devices:
+                self.run_targets(device)
 
     def fuck(self):
         self.run_devices()
@@ -146,3 +182,4 @@ if __name__ == '__main__':
     # 进行测试
     dffa = DFFA()
     dffa.fuck()
+    # dffa.list_devices()

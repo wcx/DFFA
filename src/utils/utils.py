@@ -6,22 +6,16 @@ from datetime import timedelta
 
 
 def home_screen():
-    '''
-    向Android Device发送HOME键动作事件
-    '''
     return send_key_event('3')
 
 
 def send_key_event(event_num):
-    '''
-    向Android Device发送任意键动作事件
-    '''
     cmd = ['adb', 'shell', 'input', 'keyevent', event_num]
     popen_wait(cmd)
 
 
-def print_symbol(str):
-    print("---------------------------------------" + str +
+def print_symbol(string):
+    print("---------------------------------------" + string +
           "---------------------------------------------------")
 
 
@@ -68,11 +62,6 @@ def timeout_cmd(cmd, timeout=60):
     return p
 
 
-class logger(object):
-    def info(self, info):
-        print info
-
-
 def log_runtime(function):
     """
     包装方法,显示方法运行时间
@@ -99,4 +88,4 @@ def log_runtime(function):
 
 
 if __name__ == "__main__":
-    print timeout_cmd(cmd='ping www.redicecn.com')
+    pass

@@ -54,7 +54,6 @@ class IntentFilter(object):
         self.actions = actions
         self.categorys = categorys
         self.mime_types = mime_types
-        pass
 
 
 class TestCase(object):
@@ -77,6 +76,14 @@ class TestCase(object):
     @target.setter
     def target(self, value):
         self._target = value
+
+
+class Device(object):
+    serialno = ''
+    version_release = ''
+    model = ''
+    brand = ''
+    build_id = ''
 
 
 if __name__ == '__main__':
