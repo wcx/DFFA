@@ -1,13 +1,13 @@
-import androguard.core.api_specific_resources.aosp_permissions.aosp_permissions_api9 as api9
-import androguard.core.api_specific_resources.aosp_permissions.aosp_permissions_api10 as api10
-import androguard.core.api_specific_resources.aosp_permissions.aosp_permissions_api14 as api14
-import androguard.core.api_specific_resources.aosp_permissions.aosp_permissions_api15 as api15
-import androguard.core.api_specific_resources.aosp_permissions.aosp_permissions_api16 as api16
-import androguard.core.api_specific_resources.aosp_permissions.aosp_permissions_api17 as api17
-import androguard.core.api_specific_resources.aosp_permissions.aosp_permissions_api18 as api18
-import androguard.core.api_specific_resources.aosp_permissions.aosp_permissions_api19 as api19
-import androguard.core.api_specific_resources.aosp_permissions.aosp_permissions_api21 as api21
-import androguard.core.api_specific_resources.aosp_permissions.aosp_permissions_api22 as api22
+import src.pretreatment.androguard.core.api_specific_resources.aosp_permissions.aosp_permissions_api9 as api9
+import src.pretreatment.androguard.core.api_specific_resources.aosp_permissions.aosp_permissions_api10 as api10
+import src.pretreatment.androguard.core.api_specific_resources.aosp_permissions.aosp_permissions_api14 as api14
+import src.pretreatment.androguard.core.api_specific_resources.aosp_permissions.aosp_permissions_api15 as api15
+import src.pretreatment.androguard.core.api_specific_resources.aosp_permissions.aosp_permissions_api16 as api16
+import src.pretreatment.androguard.core.api_specific_resources.aosp_permissions.aosp_permissions_api17 as api17
+import src.pretreatment.androguard.core.api_specific_resources.aosp_permissions.aosp_permissions_api18 as api18
+import src.pretreatment.androguard.core.api_specific_resources.aosp_permissions.aosp_permissions_api19 as api19
+import src.pretreatment.androguard.core.api_specific_resources.aosp_permissions.aosp_permissions_api21 as api21
+import src.pretreatment.androguard.core.api_specific_resources.aosp_permissions.aosp_permissions_api22 as api22
 
 AOSP_PERMISSIONS = {
     "9": {

@@ -7,11 +7,11 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 
 import os
+
+from src.pretreatment.androguard.core.bytecodes import apk
 from src.transwarp.db import MySQLHelper
-from androguard.core.bytecodes import apk
 from src.models import TestTarget, IntentFilter
 
-BASE_APK_PATH = "../../res/apks"
 BASE_SEED_PATH = "../../res/seeds"
 
 
@@ -132,7 +132,7 @@ def parse_apks(base_path):
 
 
 if __name__ == '__main__':
-    parse_apks(BASE_APK_PATH)
+    parse_apks('../../res/apks')
     # apkf = apk.APK('/home/wcx/Download/apk/04d7098dc1c6268c870d0b20aa881bfe.apk')
     # print apkf.get_app_name()
     # sqlhelper = MySQLHelper()

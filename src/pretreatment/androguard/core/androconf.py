@@ -21,12 +21,12 @@ import logging
 import types
 import random
 import string
-import imp
+
+from src.pretreatment.androguard.core.api_specific_resources.aosp_permissions.aosp_permissions import AOSP_PERMISSIONS
+from src.pretreatment.androguard.core.api_specific_resources.api_permission_mappings.api_permission_mappings import \
+    AOSP_PERMISSIONS_MAPPINGS
 
 ANDROGUARD_VERSION = "2.0-dev"
-
-from androguard.core.api_specific_resources.aosp_permissions.aosp_permissions import AOSP_PERMISSIONS
-from androguard.core.api_specific_resources.api_permission_mappings.api_permission_mappings import AOSP_PERMISSIONS_MAPPINGS
 
 
 def is_ascii_problem(s):
@@ -65,7 +65,7 @@ CONF = {
     "PRETTY_SHOW": 1,
     "TMP_DIRECTORY": "/tmp/",
     # Full python or mix python/c++ (native)
-    #"ENGINE" : "automatic",
+    # "ENGINE" : "automatic",
     "ENGINE": "python",
     "RECODE_ASCII_STRING": False,
     "RECODE_ASCII_STRING_METH": None,
@@ -235,7 +235,7 @@ def is_android_raw(raw):
     elif raw[0:4] == "\x02\x00\x0C\x00":
         val = "ARSC"
     elif ('AndroidManifest.xml' in raw and
-          'META-INF/MANIFEST.MF' in raw):
+                  'META-INF/MANIFEST.MF' in raw):
         val = "APK"
 
     return val
@@ -243,6 +243,7 @@ def is_android_raw(raw):
 
 def is_valid_android_raw(raw):
     return raw.find("classes.dex") != -1
+
 
 # from scapy
 log_andro = logging.getLogger("andro")
