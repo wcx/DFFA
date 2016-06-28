@@ -52,7 +52,7 @@ class MySQLHelper:
               "action varchar(80)," \
               "category varchar(80)," \
               "mime_type varchar(60)," \
-              "file_name varchar(80)," \
+              "file_name varchar(200)," \
               "app_name varchar(30)," \
               "version_code varchar(30)," \
               "version_name varchar(30)," \
@@ -66,27 +66,20 @@ class MySQLHelper:
             n = self.cur.execute(sql)
             return n
         except MySQLdb.Error as e:
-            print("Mysql Error:%snSQL:%s" % (e, sql))
+            print("Mysql Error:%sSQL:%s" % (e, sql))
 
-    def queryRow(self, sql):
+    def query_row(self, sql):
         self.query(sql)
         result = self.cur.fetchone()
         return result
-        #
-        #
-        # def queryAll(self, sql):
-        #     self.query(sql)
-        #     result = self.cur.fetchall()
-        #     desc = self.cur.description
-        #     d = []
-        #     for inv in result:
-        #         _d = {}
-        #     for i in range(0, len(inv)):
-        #         _d[desc[i][0]] = str(inv[i])
-        #     d.append(_d)
-        #     return d
-        #
-        #
+
+    def query_more(self, sql, number=0):
+        self.query(sql)
+        if number < 1:
+            result = self.cur.fetchall()
+        else:
+            result = self.cur.fetchmany(number)
+        return result
 
     def insert(self, p_table_name, p_data):
         for key in p_data:
@@ -125,12 +118,23 @@ class MySQLHelper:
             self.insert(self.TABLE_TARGET, vars(target))
 
     def query_target(self):
-        sql = "select * from {0} where id=64".format(self.TABLE_TARGET)
-        result = self.queryRow(sql)
+        sql = "select * from {0} where mime_type={1}".format(self.TABLE_TARGET, 'image/png')
+        result = self.query_row(sql)
         target = TestTarget(result[1], result[2], result[3], result[4], result[5], result[6], result[7], result[8],
                             result[9], result[10])
         target.id = result[0]
         return target
+
+    def query_targets_by_type(self, mime_type, number=0):
+        sql = "select * from {0} where mime_type='{1}'".format(self.TABLE_TARGET, mime_type)
+        result = self.query_more(sql, number)
+        targets = []
+        for row in result:
+            target = TestTarget(row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8],
+                                row[9], row[10])
+            target.id = row[0]
+            targets.append(target)
+        return targets
 
 
 if __name__ == '__main__':
@@ -138,5 +142,6 @@ if __name__ == '__main__':
     # p_data = {'package': "com.test", 'activity': "com.test.act", 'file_name': "/sd/a/a.jpg", 'app_name': "piuk",
     #           'version_code': "123", "version_name": "1.01", "seeds": "~/"}
     # n = sqlhelper.insert(sqlhelper.TABLE_TARGET, p_data)
-    print sqlhelper.query_target()
+    targets = sqlhelper.query_targets_by_type('image/png',0)
+    print len(targets)
     sqlhelper.close()

@@ -11,13 +11,15 @@
 
 from src import conf
 from src.models import TestCase, Device
+from src.pretreatment.pretreatment import parse_apks
 from src.transwarp.db import MySQLHelper
 from utils.utils import *
 
 
 class DFFA(object):
     adb_cmd = ['adb', '-s']
-    log_path = conf.LOG_PATH
+    log_path = ''
+    installed_apk = set()
 
     def get_uni_crash(self):
 
@@ -64,20 +66,7 @@ class DFFA(object):
                 print log
                 # for line in p.stdout.readlines():
 
-    def is_install(self, target):
-        check_cmd = self.adb_cmd + (['shell', 'pm', 'list', 'package', '|', 'grep', '-c', target.package])
-        p = popen_wait(check_cmd)
-        result = p.stdout.readline().strip()
-        return int(result)
-
-    def install_apk(self, target):
-        install_cmd = self.adb_cmd + (['install', target.file_name])
-        if not self.is_install(target):
-            print 'install ' + target.app_name
-            print to_cmd_str(install_cmd)
-            popen_wait(install_cmd)
-
-    def run_job(self, cases, mutant_files_path, job_id):
+    def run_job(self, cases, mutant_files_path):
         for i, case in enumerate(cases):
             print_symbol(str(i))
             # push变异文件
@@ -105,34 +94,61 @@ class DFFA(object):
 
                 for file in mutant_files:
                     cases.append(TestCase(target, file))
-                self.run_job(cases, mutant_files_path, i)
+                self.run_job(cases, mutant_files_path)
         else:
             print '没有对应变异文件,程序退出:\n' + format + ' files didn\'t exist'
 
     def select_targets(self):
         sqlhelper = MySQLHelper()
-        target = sqlhelper.query_target()
+        targets = sqlhelper.query_targets_by_type('image/png')
         sqlhelper.close()
-        print target
-        targets = list()
-        targets.append(target)
         return targets
+
+    def is_install(self, target):
+        check_cmd = self.adb_cmd + (['shell', 'pm', 'list', 'package', '|', 'grep', '-c', target.package])
+        p = popen_wait(check_cmd)
+        result = p.stdout.readline().strip()
+        return int(result)
+
+    def install_apk(self, target):
+        install_cmd = self.adb_cmd + (['install', target.file_name])
+        if not self.is_install(target):
+            print 'install ' + target.app_name
+            print to_cmd_str(install_cmd)
+            popen_wait(install_cmd)
+            self.installed_apk.add(target.package)
+            print self.installed_apk
+
+    def uninstall(self, target):
+        if target.package in self.installed_apk:
+            uninstall_cmd = self.adb_cmd + (['uninstall', target.package])
+            print to_cmd_str(uninstall_cmd)
+            popen_wait(uninstall_cmd)
+            self.installed_apk.remove(target.package)
+            print self.installed_apk
 
     def run_targets(self, device):
         # 指定设备
         self.adb_cmd.extend([device.serialno])
         # 选择测试目标
         targets = self.select_targets()
-        for target in targets:
-            self.log_path += '/' + device.serialno + '/target-' + str(target.id)
+        length = len(targets)
+        for i, target in enumerate(targets):
+            self.log_path = conf.LOG_PATH + '/' + device.serialno + '/target-' + str(target.id)
             mkdirs(self.log_path)
             # 检查目标APP是否安装,未安装则进行安装
             self.install_apk(target)
             # 开始运行测试用例
             if self.is_install(target):
                 self.run_jobs(target)
+                # 卸载APP,如果下一次还是这个APP就不要卸载啦
+                if (i + 1) < length:
+                    if target.package != targets[i + 1].package:
+                        self.uninstall(target)
+                else:
+                    self.uninstall(target)
             else:
-                print 'app未安装,程序退出'
+                print '{0}未安装,程序退出'.format(target.app_name.strip())
 
     def getprop(self, device, key):
         """
