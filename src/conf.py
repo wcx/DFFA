@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*
 
 CUSTOM_PATH = '/media/wcx/Ubuntu 14.0/ResearchData/res'
-DEFAULT_PATH = '../res'
+DEFAULT_PATH = '/home/wcx/Development/Research/DFFA/res'
 # 父目录
 BASE_PATH = DEFAULT_PATH
 # 存放apk的路径

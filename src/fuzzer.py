@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*
 import copy
-import os
 import random
 
 from bitstring import BitArray
 
-from src.utils import conf
+from src import conf
 from src.utils.utils import log_runtime, mkdirs
 
 
@@ -121,7 +120,7 @@ def fuzz_file(**kwargs):
             log_path = custom_path + '/' + format + '/' + 'logs/'
             mkdirs(output_path)
             mkdirs(log_path)
-            log_file = log_path + 'log-' + str(i) + '.txt'
+            log_file = log_path + 'log-' + str(i)
             with open(log_file, 'a') as log:
                 log.write("***************job" + str(i) + "***************")
                 log.write('\n')

@@ -1,14 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import warnings
+
 
 import MySQLdb
 
 from src.models import TestTarget
-
-warnings.filterwarnings("ignore")
-
-__author__ = 'wcx'
 
 '''
 Database operation module.
@@ -52,15 +48,15 @@ class MySQLHelper:
         sql = "create table {0}" \
               "(id int not null primary key auto_increment," \
               "package varchar(30)," \
-              "activity varchar(60)," \
-              "action varchar(60)," \
-              "category varchar(60)," \
+              "activity varchar(80)," \
+              "action varchar(80)," \
+              "category varchar(80)," \
               "mime_type varchar(60)," \
-              "file_name varchar(30)," \
+              "file_name varchar(80)," \
               "app_name varchar(30)," \
               "version_code varchar(30)," \
               "version_name varchar(30)," \
-              "seed varchar(60))" \
+              "seed varchar(80))" \
             .format(self.table)
 
         self.cur.execute(sql)
@@ -129,11 +125,11 @@ class MySQLHelper:
             self.insert(self.TABLE_TARGET, vars(target))
 
     def query_target(self):
-        sql = "select * from {0} where id=29".format(self.TABLE_TARGET)
+        sql = "select * from {0} where id=64".format(self.TABLE_TARGET)
         result = self.queryRow(sql)
-        print result
         target = TestTarget(result[1], result[2], result[3], result[4], result[5], result[6], result[7], result[8],
                             result[9], result[10])
+        target.id = result[0]
         return target
 
 

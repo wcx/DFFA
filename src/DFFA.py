@@ -8,12 +8,10 @@
  */
 
 """
-import os
 
-from src.fuzzer import fuzz_file
-from src.models import TestTarget, TestCase, Device
-from src.pretreatment.pretreatment import parse_apks
-from src.utils import conf
+from src import conf
+from src.models import TestCase, Device
+from src.transwarp.db import MySQLHelper
 from utils.utils import *
 
 
@@ -54,20 +52,29 @@ class DFFA(object):
         popen_wait(log_clean_cmd)
 
     def flush_log(self, case):
-        log_cmd = self.adb_cmd + (['logcat', '-d', '-v', 'time', '*:E', '>',
-                                   self.log_path + '/' + 'log-' + case.mutant_file + '.txt'])
-
+        log_cmd = self.adb_cmd + (['logcat', '-d', '-v', 'time', '*:F'])
         print'执行:' + to_cmd_str(log_cmd)
-        popen_wait(log_cmd)
+        p = popen_wait(log_cmd)
+        log = p.stdout.readlines()
+        if log.__len__() < 3:
+            print 'no bug'
+        else:
+            with open(self.log_path + '/' + case.mutant_file.split('.')[0], 'w') as log_file:
+                log_file.writelines(log)
+                print log
+                # for line in p.stdout.readlines():
 
     def is_install(self, target):
         check_cmd = self.adb_cmd + (['shell', 'pm', 'list', 'package', '|', 'grep', '-c', target.package])
         p = popen_wait(check_cmd)
-        return p.stdout.readline()
+        result = p.stdout.readline().strip()
+        return int(result)
 
     def install_apk(self, target):
         install_cmd = self.adb_cmd + (['install', target.file_name])
         if not self.is_install(target):
+            print 'install ' + target.app_name
+            print to_cmd_str(install_cmd)
             popen_wait(install_cmd)
 
     def run_job(self, cases, mutant_files_path, job_id):
@@ -103,30 +110,29 @@ class DFFA(object):
             print '没有对应变异文件,程序退出:\n' + format + ' files didn\'t exist'
 
     def select_targets(self):
-        # sqlhelper = MySQLHelper()
-        # target = sqlhelper.query_target()
-        # sqlhelper.close()
+        sqlhelper = MySQLHelper()
+        target = sqlhelper.query_target()
+        sqlhelper.close()
+        print target
         targets = list()
-        target = TestTarget('com.tencent.mm', 'com.tencent.mm.ui.tools.ShareScreenImgUI',
-                            'android.intent.action.VIEW', 'android.intent.category.DEFAULT', 'image/png', 'foo', 'pic',
-                            '11',
-                            '22',
-                            'test/')
         targets.append(target)
         return targets
 
     def run_targets(self, device):
         # 指定设备
         self.adb_cmd.extend([device.serialno])
-        self.log_path += '/' + device.serialno
-        mkdirs(self.log_path)
         # 选择测试目标
         targets = self.select_targets()
         for target in targets:
+            self.log_path += '/' + device.serialno + '/target-' + str(target.id)
+            mkdirs(self.log_path)
             # 检查目标APP是否安装,未安装则进行安装
             self.install_apk(target)
             # 开始运行测试用例
-            self.run_jobs(target)
+            if self.is_install(target):
+                self.run_jobs(target)
+            else:
+                print 'app未安装,程序退出'
 
     def getprop(self, device, key):
         """
@@ -196,4 +202,3 @@ if __name__ == '__main__':
     # 进行测试
     dffa = DFFA()
     dffa.fuck()
-    # dffa.list_devices()

@@ -1,13 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import sys
-
-sys.path.append('../../')
-reload(sys)
-sys.setdefaultencoding('utf8')
-
 import os
-
 from src.pretreatment.androguard.core.bytecodes import apk
 from src.transwarp.db import MySQLHelper
 from src.models import TestTarget, IntentFilter
@@ -26,23 +19,23 @@ def get_attributes(sitem, tag, attribute):
 
 def get_target_mime(mime_types):
     target_mime = set()
-    for t in mime_types:
-        if t.startswith("image/") or t.startswith("video/") or t.startswith("*/"):
-            if t == "image/*":
+    for type in mime_types:
+        if type.startswith("image/") or type.startswith("video/") or type.startswith("*/"):
+            if type == "image/*":
                 target_mime.add("image/gif")
                 target_mime.add("image/jpg")
                 target_mime.add("image/png")
-            elif t == "video/*":
+            elif type == "video/*":
                 target_mime.add("video/mp3")
                 target_mime.add("video/mp4")
-            elif t == "*/*":
+            elif type == "*/*":
                 target_mime.add("image/gif")
                 target_mime.add("image/jpg")
                 target_mime.add("image/png")
                 target_mime.add("video/mp3")
                 target_mime.add("video/mp4")
-            elif t == "image/gif" or t == "image/jpg" or t == "image/png" or t == "video/mp3" or t == "video/mp4":
-                target_mime.add(t)
+            elif type == "image/gif" or type == "image/jpg" or type == "image/png" or type == "video/mp3" or type == "video/mp4":
+                target_mime.add(type)
     return target_mime
 
 
@@ -100,7 +93,6 @@ def to_targets(apk_path):
                                    apkf.get_app_name(),
                                    apkf.get_androidversion_code(), apkf.get_androidversion_name(),
                                    seed))
-
     print "---结束---target convert---"
     return targets
 
