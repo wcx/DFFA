@@ -9,9 +9,9 @@
 
 """
 
-from src.models import TestTarget, TestCase, Device
+from src import conf
+from src.models import TestCase, Device
 from src.transwarp.db import MySQLHelper
-from src.utils import conf
 from utils.utils import *
 
 
@@ -52,11 +52,17 @@ class DFFA(object):
         popen_wait(log_clean_cmd)
 
     def flush_log(self, case):
-        log_cmd = self.adb_cmd + (['logcat', '-d', '-v', 'time', '*:F', '>',
-                                   self.log_path + '/' + 'log-' + case.mutant_file + '.txt'])
-
+        log_cmd = self.adb_cmd + (['logcat', '-d', '-v', 'time', '*:F'])
         print'执行:' + to_cmd_str(log_cmd)
-        popen_wait(log_cmd)
+        p = popen_wait(log_cmd)
+        log = p.stdout.readlines()
+        if log.__len__() < 3:
+            print 'no bug'
+        else:
+            with open(self.log_path + '/' + case.mutant_file.split('.')[0], 'w') as log_file:
+                log_file.writelines(log)
+                print log
+                # for line in p.stdout.readlines():
 
     def is_install(self, target):
         check_cmd = self.adb_cmd + (['shell', 'pm', 'list', 'package', '|', 'grep', '-c', target.package])
@@ -115,11 +121,11 @@ class DFFA(object):
     def run_targets(self, device):
         # 指定设备
         self.adb_cmd.extend([device.serialno])
-        self.log_path += '/' + device.serialno
-        mkdirs(self.log_path)
         # 选择测试目标
         targets = self.select_targets()
         for target in targets:
+            self.log_path += '/' + device.serialno + '/target-' + str(target.id)
+            mkdirs(self.log_path)
             # 检查目标APP是否安装,未安装则进行安装
             self.install_apk(target)
             # 开始运行测试用例
@@ -196,4 +202,3 @@ if __name__ == '__main__':
     # 进行测试
     dffa = DFFA()
     dffa.fuck()
-    # dffa.list_devices()

@@ -3,6 +3,8 @@
 
 
 class TestTarget(object):
+    id = 0
+
     def __init__(self, package, activity, action, category, mime_type, file_name, app_name, version_code, version_name,
                  seed):
         self.package = package
@@ -15,38 +17,6 @@ class TestTarget(object):
         self.version_code = version_code
         self.version_name = version_name
         self.seed = seed
-
-        # @property
-        # def package(self):
-        #     return self.package
-        #
-        # @property
-        # def activity(self):
-        #     return self.activity
-        #
-        # @property
-        # def file_name(self):
-        #     return self.file_name
-        #
-        # @property
-        # def mime_type(self):
-        #     return self.mime_type
-        #
-        # @property
-        # def app_name(self):
-        #     return self.app_name
-        #
-        # @property
-        # def version_code(self):
-        #     return self.version_code
-        #
-        # @property
-        # def version_name(self):
-        #     return self.version_name
-        #
-        # @property
-        # def seeds(self):
-        #     return self.seeds
 
 
 class IntentFilter(object):
