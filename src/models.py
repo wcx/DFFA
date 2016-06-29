@@ -18,6 +18,12 @@ class TestTarget(object):
         self.version_name = version_name
         self.seed = seed
 
+    def __str__(self):
+        s = ''
+        for name, value in vars(self).items():
+            s += '%s=%s|' % (name, value)
+        return s
+
 
 class IntentFilter(object):
     def __init__(self, actions=[], categorys=[], mime_types=[]):
@@ -57,5 +63,7 @@ class Device(object):
 
 
 if __name__ == '__main__':
-    target = TestTarget("com.test", "com.test.act", "*/*", "/sd/a/a.jpg", "piuk", "123", "1.01", "~/")
-    print target.mime_type
+    target = TestTarget("com.test", "com.test.act", "*/*", "/sd/a/a.jpg", "*/*", "/sd/a/a.jpg", "piuk", "123", "1.01",
+                        "~/")
+    target.id = 0
+    print target.__str__()

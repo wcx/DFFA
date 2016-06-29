@@ -126,6 +126,12 @@ class MySQLHelper:
         return target
 
     def query_targets_by_type(self, mime_type, number=0):
+        """
+        根据目标mime类型来查询
+        :param mime_type:
+        :param number: <1则全部查询
+        :return:
+        """
         sql = "select * from {0} where mime_type='{1}'".format(self.TABLE_TARGET, mime_type)
         result = self.query_more(sql, number)
         targets = []
@@ -142,6 +148,6 @@ if __name__ == '__main__':
     # p_data = {'package': "com.test", 'activity': "com.test.act", 'file_name': "/sd/a/a.jpg", 'app_name': "piuk",
     #           'version_code': "123", "version_name": "1.01", "seeds": "~/"}
     # n = sqlhelper.insert(sqlhelper.TABLE_TARGET, p_data)
-    targets = sqlhelper.query_targets_by_type('image/png',0)
+    targets = sqlhelper.query_targets_by_type('image/png', 0)
     print len(targets)
     sqlhelper.close()

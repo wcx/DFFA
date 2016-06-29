@@ -20,6 +20,7 @@ class DFFA(object):
     adb_cmd = ['adb', '-s']
     log_path = ''
     installed_apk = set()
+    CUSTOM_JOB_NUM = 0
 
     def get_uni_crash(self):
 
@@ -45,17 +46,14 @@ class DFFA(object):
         open_cmd.extend(['-t', case.target.mime_type])
         open_cmd.extend(['-d', 'file://' + conf.REMOTE_PATH + case.mutant_file])
         open_cmd.append(case.target.package + "/" + case.target.activity)
-        print'执行:' + to_cmd_str(open_cmd)
         timeout_cmd(open_cmd, timeout=3)
 
     def clean_log(self):
         log_clean_cmd = self.adb_cmd + (['logcat', '-c'])
-        print'执行:' + to_cmd_str(log_clean_cmd)
         popen_wait(log_clean_cmd)
 
     def flush_log(self, case):
-        log_cmd = self.adb_cmd + (['logcat', '-d', '-v', 'time', '*:F'])
-        print'执行:' + to_cmd_str(log_cmd)
+        log_cmd = self.adb_cmd + (['logcat', '-d', '-v', 'time', '*:E'])
         p = popen_wait(log_cmd)
         log = p.stdout.readlines()
         if log.__len__() < 3:
@@ -79,13 +77,17 @@ class DFFA(object):
             self.flush_log(case)
             # 删除变异文件
             self.rm_file(case.mutant_file)
-            print_symbol('')
+            print_symbol()
 
     def run_jobs(self, target):
         format = target.mime_type.split('/')[1]
         job_path = conf.MUTANTS_PATH + '/' + format + '/'
         if os.path.exists(job_path):
-            job_num = os.listdir(job_path).__len__()
+            if self.CUSTOM_JOB_NUM == 0:
+                job_num = os.listdir(job_path).__len__()
+            else:
+                job_num = self.CUSTOM_JOB_NUM
+            print '执行任务数为' + str(job_num)
             for i in range(1, job_num):
                 mutant_files_path = job_path + str(i)
                 mutant_files = os.listdir(mutant_files_path)
@@ -98,10 +100,14 @@ class DFFA(object):
         else:
             print '没有对应变异文件,程序退出:\n' + format + ' files didn\'t exist'
 
-    def select_targets(self):
+    def select_targets(self, num=0):
         sqlhelper = MySQLHelper()
-        targets = sqlhelper.query_targets_by_type('image/png')
+        targets = sqlhelper.query_targets_by_type('image/png', num)
         sqlhelper.close()
+
+        print_after_symbol('选择的target有:')
+        for target in targets:
+            print_before_symbol(target.__str__())
         return targets
 
     def is_install(self, target):
@@ -110,45 +116,40 @@ class DFFA(object):
         result = p.stdout.readline().strip()
         return int(result)
 
-    def install_apk(self, target):
-        install_cmd = self.adb_cmd + (['install', target.file_name])
-        if not self.is_install(target):
-            print 'install ' + target.app_name
-            print to_cmd_str(install_cmd)
-            popen_wait(install_cmd)
-            self.installed_apk.add(target.package)
-            print self.installed_apk
+    def install_apks(self, targets):
+        for target in targets:
+            if target.package not in self.installed_apk:
+                if not self.is_install(target):
+                    install_cmd = self.adb_cmd + (['install', target.file_name])
+                    print 'installing ' + target.app_name
+                    popen_wait(install_cmd)
+                    self.installed_apk.add(target.package)
+        print_in_symbol('已安装apk:' + str(self.installed_apk))
 
-    def uninstall(self, target):
-        if target.package in self.installed_apk:
-            uninstall_cmd = self.adb_cmd + (['uninstall', target.package])
-            print to_cmd_str(uninstall_cmd)
-            popen_wait(uninstall_cmd)
-            self.installed_apk.remove(target.package)
-            print self.installed_apk
+    def uninstall_apks(self, targets):
+        for target in targets:
+            if target.package in self.installed_apk:
+                uninstall_cmd = self.adb_cmd + (['uninstall', target.package])
+                print 'uninstalling ' + target.app_name
+                popen_wait(uninstall_cmd)
+                self.installed_apk.remove(target.package)
 
     def run_targets(self, device):
-        # 指定设备
-        self.adb_cmd.extend([device.serialno])
         # 选择测试目标
         targets = self.select_targets()
-        length = len(targets)
+        # 检查目标APP是否安装,未安装则进行安装
+        self.install_apks(targets)
         for i, target in enumerate(targets):
-            self.log_path = conf.LOG_PATH + '/' + device.serialno + '/target-' + str(target.id)
-            mkdirs(self.log_path)
-            # 检查目标APP是否安装,未安装则进行安装
-            self.install_apk(target)
             # 开始运行测试用例
             if self.is_install(target):
-                self.run_jobs(target)
-                # 卸载APP,如果下一次还是这个APP就不要卸载啦
-                if (i + 1) < length:
-                    if target.package != targets[i + 1].package:
-                        self.uninstall(target)
-                else:
-                    self.uninstall(target)
+                self.log_path = conf.LOG_PATH + '/' + device.serialno + '/target-' + str(target.id)
+                mkdirs(self.log_path)
+                print 'run_job' + str(target.id)
+                # self.run_jobs(target)
             else:
-                print '{0}未安装,程序退出'.format(target.app_name.strip())
+                print '{0}未安装,进入下一个target'.format(target.app_name.strip())
+        # self.uninstall_apks(targets)
+        return targets
 
     def getprop(self, device, key):
         """
@@ -184,7 +185,7 @@ class DFFA(object):
         p = popen_wait(list_cmd)
         for line in p.stdout.readlines():
             content = line.split('\t')
-            if content.__len__() > 1:
+            if len(content) > 1:
                 if content[1] == 'device\n':
                     device = Device()
                     device.serialno = content[0]
@@ -193,20 +194,23 @@ class DFFA(object):
                     device.build_id = self.getprop(device, 'build_id')
                     device.version_release = self.getprop(device, 'version_release')
                     devices.append(device)
-        print '当前可用设备' + str(devices.__len__()) + '台'
+        print '当前可用设备' + str(len(devices)) + '台'
         for d in devices:
             print d.serialno + '\t' + d.brand + '\t' + d.model + '\t' + d.build_id + '\t' + d.version_release
+        print_symbol()
         return devices
 
     def run_devices(self):
         devices = self.list_devices()
-        if devices.__len__() == 0:
+        if len(devices) == 0:
             print '未连接Android设备,程序退出'
         else:
             for device in devices:
+                # 指定设备
+                self.adb_cmd.extend([device.serialno])
                 self.run_targets(device)
 
-    def fuck(self):
+    def fuzzing(self):
         self.run_devices()
 
 
@@ -217,4 +221,4 @@ if __name__ == '__main__':
     # fuzz_file(seedfile='../res/seeds/Lenna.png', job_num=10, job_case_num=3)
     # 进行测试
     dffa = DFFA()
-    dffa.fuck()
+    dffa.fuzzing()

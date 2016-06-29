@@ -15,9 +15,25 @@ def send_key_event(event_num):
     popen_wait(cmd)
 
 
-def print_symbol(string):
+def print_symbol(string=''):
     print("---------------------------------------" + string +
           "---------------------------------------------------")
+
+
+def print_before_symbol(string, message=''):
+    print string
+    print_symbol(string=message)
+
+
+def print_in_symbol(string, message=''):
+    print_symbol(string=message)
+    print string
+    print_symbol(string=message)
+
+
+def print_after_symbol(string, message=''):
+    print_symbol(string=message)
+    print string
 
 
 def to_cmd_str(cmd):
@@ -34,8 +50,10 @@ class TimeoutError(Exception):
     pass
 
 
-def popen_wait(cmd):
+def popen_wait(cmd, is_print=False):
     cmd = to_cmd_str(cmd)
+    if is_print:
+        print cmd
     p = subprocess.Popen(cmd, stderr=subprocess.STDOUT, stdout=subprocess.PIPE, shell=True)
     p.wait()
     return p
