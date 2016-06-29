@@ -20,7 +20,7 @@ class DFFA(object):
     adb_cmd = ['adb', '-s']
     log_path = ''
     installed_apk = set()
-    CUSTOM_JOB_NUM = 0
+    CUSTOM_JOB_NUM = 25
 
     def get_uni_crash(self):
 
@@ -53,10 +53,10 @@ class DFFA(object):
         popen_wait(log_clean_cmd)
 
     def flush_log(self, case):
-        log_cmd = self.adb_cmd + (['logcat', '-d', '-v', 'time', '*:E'])
+        log_cmd = self.adb_cmd + (['logcat', '-d', '-v', 'time', '*:F'])
         p = popen_wait(log_cmd)
         log = p.stdout.readlines()
-        if log.__len__() < 3:
+        if log.__len__() < 4:
             print 'no bug'
         else:
             with open(self.log_path + '/' + case.mutant_file.split('.')[0], 'w') as log_file:
@@ -83,7 +83,7 @@ class DFFA(object):
         format = target.mime_type.split('/')[1]
         job_path = conf.MUTANTS_PATH + '/' + format + '/'
         if os.path.exists(job_path):
-            if self.CUSTOM_JOB_NUM == 0:
+            if self.CUSTOM_JOB_NUM < 1:
                 job_num = os.listdir(job_path).__len__()
             else:
                 job_num = self.CUSTOM_JOB_NUM
@@ -144,11 +144,11 @@ class DFFA(object):
             if self.is_install(target):
                 self.log_path = conf.LOG_PATH + '/' + device.serialno + '/target-' + str(target.id)
                 mkdirs(self.log_path)
-                print 'run_job' + str(target.id)
-                # self.run_jobs(target)
+                print 'run job-' + str(target.id)
+                self.run_jobs(target)
             else:
                 print '{0}未安装,进入下一个target'.format(target.app_name.strip())
-        # self.uninstall_apks(targets)
+        self.uninstall_apks(targets)
         return targets
 
     def getprop(self, device, key):

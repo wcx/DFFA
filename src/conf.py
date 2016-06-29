@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*
 
-CUSTOM_PATH = '/media/wcx/Ubuntu 14.0/ResearchData/res'
+CUSTOM_PATH = '/media/wcx/Ubuntu 14.0/ResearchData'
 DEFAULT_PATH = '/home/wcx/Development/Research/DFFA/res'
 # 父目录
-BASE_PATH = DEFAULT_PATH
+BASE_PATH = CUSTOM_PATH
 # 存放apk的路径
 APK_PATH = BASE_PATH + '/apks'
 # 存放bugreport的路径
