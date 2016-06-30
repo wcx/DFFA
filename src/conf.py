@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*
 
-CUSTOM_PATH = '/media/wcx/Ubuntu 14.0/ResearchData'
+CUSTOM_PATH = '/media/wcx/Ubuntu 14.0/ResearchData/2'
 DEFAULT_PATH = '/home/wcx/Development/Research/DFFA/res'
 # 父目录
 BASE_PATH = CUSTOM_PATH

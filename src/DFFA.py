@@ -8,8 +8,10 @@
  */
 
 """
+import sys
 
 from src import conf
+from src.fuzzer import fuzz_file
 from src.models import TestCase, Device
 from src.pretreatment.pretreatment import parse_apks
 from src.transwarp.db import MySQLHelper
@@ -20,7 +22,7 @@ class DFFA(object):
     adb_cmd = ['adb', '-s']
     log_path = ''
     installed_apk = set()
-    CUSTOM_JOB_NUM = 25
+    CUSTOM_JOB_NUM = 0
 
     def get_uni_crash(self):
 
@@ -46,14 +48,14 @@ class DFFA(object):
         open_cmd.extend(['-t', case.target.mime_type])
         open_cmd.extend(['-d', 'file://' + conf.REMOTE_PATH + case.mutant_file])
         open_cmd.append(case.target.package + "/" + case.target.activity)
-        timeout_cmd(open_cmd, timeout=3)
+        timeout_cmd(open_cmd, is_print=True)
 
     def clean_log(self):
         log_clean_cmd = self.adb_cmd + (['logcat', '-c'])
         popen_wait(log_clean_cmd)
 
     def flush_log(self, case):
-        log_cmd = self.adb_cmd + (['logcat', '-d', '-v', 'time', '*:F'])
+        log_cmd = self.adb_cmd + (['logcat', '-d', '-v', 'time', 'AndroidRuntime:E', '*:S'])
         p = popen_wait(log_cmd)
         log = p.stdout.readlines()
         if log.__len__() < 4:
@@ -64,9 +66,10 @@ class DFFA(object):
                 print log
                 # for line in p.stdout.readlines():
 
-    def run_job(self, cases, mutant_files_path):
+    def run_job(self, cases, mutant_files_path, job_id):
         for i, case in enumerate(cases):
-            print_symbol(str(i))
+            print_symbol('target id-' + str(case.target.id) + '\t' + str(case.target.app_name) + '\tcase id-' + str(
+                job_id) + '-' + str(i + 1))
             # push变异文件
             self.push_file(mutant_files_path, case.mutant_file)
             # 清空日志
@@ -79,26 +82,28 @@ class DFFA(object):
             self.rm_file(case.mutant_file)
             print_symbol()
 
+    @log_runtime
     def run_jobs(self, target):
         format = target.mime_type.split('/')[1]
         job_path = conf.MUTANTS_PATH + '/' + format + '/'
         if os.path.exists(job_path):
             if self.CUSTOM_JOB_NUM < 1:
-                job_num = os.listdir(job_path).__len__()
+                job_num = os.listdir(job_path).__len__() - 1
             else:
                 job_num = self.CUSTOM_JOB_NUM
             print '执行任务数为' + str(job_num)
-            for i in range(1, job_num):
-                mutant_files_path = job_path + str(i)
+            for job_id in range(1, job_num):
+                mutant_files_path = job_path + str(job_id)
                 mutant_files = os.listdir(mutant_files_path)
 
                 cases = list()
 
                 for file in mutant_files:
                     cases.append(TestCase(target, file))
-                self.run_job(cases, mutant_files_path)
+                self.run_job(cases, mutant_files_path, job_id)
         else:
             print '没有对应变异文件,程序退出:\n' + format + ' files didn\'t exist'
+            sys.exit()
 
     def select_targets(self, num=0):
         sqlhelper = MySQLHelper()
@@ -110,20 +115,25 @@ class DFFA(object):
             print_before_symbol(target.__str__())
         return targets
 
-    def is_install(self, target):
-        check_cmd = self.adb_cmd + (['shell', 'pm', 'list', 'package', '|', 'grep', '-c', target.package])
+    def is_install(self, package):
+        print 'checking target ' + package
+        check_cmd = self.adb_cmd + (['shell', 'pm', 'list', 'package', '|', 'grep', '-c', package])
         p = popen_wait(check_cmd)
         result = p.stdout.readline().strip()
         return int(result)
 
     def install_apks(self, targets):
+        packages = set()
         for target in targets:
-            if target.package not in self.installed_apk:
-                if not self.is_install(target):
-                    install_cmd = self.adb_cmd + (['install', target.file_name])
-                    print 'installing ' + target.app_name
+            packages.add(target.package)
+
+        for package in packages:
+            if package not in self.installed_apk:
+                if not self.is_install(package):
+                    install_cmd = self.adb_cmd + (['install', package])
+                    print 'installing ' + package
                     popen_wait(install_cmd)
-                    self.installed_apk.add(target.package)
+                    self.installed_apk.add(package)
         print_in_symbol('已安装apk:' + str(self.installed_apk))
 
     def uninstall_apks(self, targets):
@@ -141,13 +151,17 @@ class DFFA(object):
         self.install_apks(targets)
         for i, target in enumerate(targets):
             # 开始运行测试用例
-            if self.is_install(target):
+            if self.is_install(target.package):
                 self.log_path = conf.LOG_PATH + '/' + device.serialno + '/target-' + str(target.id)
                 mkdirs(self.log_path)
-                print 'run job-' + str(target.id)
+                print_after_symbol('Fuzzing target-' + str(target.id))
                 self.run_jobs(target)
             else:
                 print '{0}未安装,进入下一个target'.format(target.app_name.strip())
+            logs = os.listdir(self.log_path)
+            if len(logs) == 0:
+                os.removedirs(self.log_path)
+
         self.uninstall_apks(targets)
         return targets
 
@@ -204,6 +218,7 @@ class DFFA(object):
         devices = self.list_devices()
         if len(devices) == 0:
             print '未连接Android设备,程序退出'
+            sys.exit()
         else:
             for device in devices:
                 # 指定设备
@@ -218,7 +233,7 @@ if __name__ == '__main__':
     # 解析apk
     # parse_apks(conf.APK_PATH)
     # 生成测试文件
-    # fuzz_file(seedfile='../res/seeds/Lenna.png', job_num=10, job_case_num=3)
+    # fuzz_file(seedfile='/home/wcx/Development/Research/DFFA/res/seeds/Lenna.png', job_num=2, job_case_num=1)
     # 进行测试
     dffa = DFFA()
     dffa.fuzzing()

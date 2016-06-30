@@ -59,16 +59,17 @@ def popen_wait(cmd, is_print=False):
     return p
 
 
-def timeout_cmd(cmd, timeout=5):
+def timeout_cmd(cmd, timeout=5, is_print=False):
     """
     执行命令cmd，返回命令输出的内容。
     如果超时将会抛出TimeoutError异常。
+    :param is_print:
     :param cmd: 要执行的命令
     :param timeout: 最长等待时间，单位：秒
     :return:
     """
     cmd = ['timeout', str(timeout)] + cmd
-    popen_wait(cmd)
+    popen_wait(cmd, is_print)
 
 
 # def timeout_cmd(cmd, timeout=60):
